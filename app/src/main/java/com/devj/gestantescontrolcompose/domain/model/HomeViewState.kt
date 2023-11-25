@@ -1,6 +1,6 @@
 package com.devj.gestantescontrolcompose.domain.model
 
-import com.devj.gestantescontrolcompose.presenter.model.PregnantUI
+import com.devj.gestantescontrolcompose.ui.model.PregnantUI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

@@ -1,4 +1,4 @@
-package com.devj.gestantescontrol.utils
+package com.devj.gestantescontrolcompose.utils
 
 fun String.ifEmptyReturnNull(): String? {
     return if (this != "") {

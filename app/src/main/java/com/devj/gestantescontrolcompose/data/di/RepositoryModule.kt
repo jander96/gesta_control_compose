@@ -1,7 +1,7 @@
 package com.devj.gestantescontrol.data.di
 
 import com.devj.gestantescontrol.data.Cache
-import com.devj.gestantescontrol.data.PregnantRepositoryImp
+import com.devj.gestantescontrolcompose.data.PregnantRepositoryImp
 import com.devj.gestantescontrol.data.cache.RoomCache
 import com.devj.gestantescontrolcompose.domain.PregnantRepository
 import dagger.Binds

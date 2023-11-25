@@ -1,4 +1,4 @@
-package com.devj.gestantescontrol.utils
+package com.devj.gestantescontrolcompose.utils
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
