@@ -6,10 +6,6 @@ import com.devj.gestantescontrolcompose.domain.actions.EditionAction
 import com.devj.gestantescontrolcompose.domain.intents.EditionIntent
 import com.devj.gestantescontrolcompose.domain.intents.mapToAction
 import com.devj.gestantescontrolcompose.domain.model.EditionViewState
-import com.devj.gestantescontrolcompose.domain.model.Formulary
-import com.devj.gestantescontrolcompose.domain.model.FormularyMapper
-import com.devj.gestantescontrolcompose.domain.model.FormularyValidator
-import com.devj.gestantescontrolcompose.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.domain.results.EditionEffect
 import com.devj.gestantescontrolcompose.domain.usescases.GetPregnant
 import com.devj.gestantescontrolcompose.domain.usescases.InsertPregnant
@@ -29,8 +25,6 @@ import javax.inject.Inject
 class EditionViewModel @Inject constructor(
     private val insertPregnant: InsertPregnant,
     private val getPregnant: GetPregnant,
-    private val formularyMapper: FormularyMapper,
-    private val formularyValidator: FormularyValidator,
     private val uiMapper: UIMapper
 ) : ViewModel() {
 
@@ -41,26 +35,21 @@ class EditionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            intentFlow.map {
-                it.mapToAction()
-            }.map {
-                processor(it)
-            }.collect { effect ->
-                _viewState.update { reduce(_viewState.value, effect) }
-            }
+            intentFlow.map { it.mapToAction() }
+                .map(::processor)
+                .collect { effect ->
+                    _viewState.update {
+                        reduce(_viewState.value, effect)
+                    }
+                }
         }
     }
 
     private suspend fun processor(action: EditionAction): EditionEffect {
         return when (action) {
             is EditionAction.GetPregnant -> getPregnant(action.id)
-            is EditionAction.InsertPregnant -> insertPregnant(getPregnantFromFormulary(action.data))
-            is EditionAction.ValidateInputData -> formularyValidator(action.data)
+            is EditionAction.InsertPregnant -> insertPregnant(action.pregnant)
         }
-    }
-
-    private fun getPregnantFromFormulary(data: Formulary): Pregnant {
-        return formularyMapper.mapToPregnant(data)
     }
 
 
@@ -81,18 +70,10 @@ class EditionViewModel @Inject constructor(
                 isThereNewPregnant = true
             )
 
-            EditionEffect.SuccessValidation -> oldViewState.copy(
-                isInvalidFormulary = false
-            )
-            is EditionEffect.ValidationError -> oldViewState.copy(
-                isInvalidFormulary = true,
-                error = Event(result.throwable)
-            )
-
             is EditionEffect.PregnantFound -> oldViewState.copy(
                 pregnant = uiMapper.fromDomain(result.pregnant),
                 error = null,
-                isThereNewPregnant = false
+                isThereNewPregnant = false,
             )
             EditionEffect.PregnantNotFound -> oldViewState.copy(
                 pregnant = null,

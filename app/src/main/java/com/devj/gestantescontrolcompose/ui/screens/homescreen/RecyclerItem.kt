@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -33,7 +33,7 @@ fun RecyclerItem(modifier: Modifier = Modifier,pregnant: PregnantUI, onClick: (P
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp, topStart = 60.dp, bottomStart = 60.dp))
             .clickable {
                 onClick(pregnant)
             }) {
@@ -41,7 +41,7 @@ fun RecyclerItem(modifier: Modifier = Modifier,pregnant: PregnantUI, onClick: (P
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()) {
-            AvatarImage(size= 72.dp,image = pregnant.photo.convertToBitmap(), placeholder = R.drawable.profile)
+            AvatarImage(size= 72.dp,image =if (pregnant.photo.isNotEmpty()) pregnant.photo.convertToBitmap() else null, placeholder = R.drawable.profile)
             Row(horizontalArrangement = Arrangement.Center,modifier = modifier
                 .fillMaxWidth()) {
                 Column(

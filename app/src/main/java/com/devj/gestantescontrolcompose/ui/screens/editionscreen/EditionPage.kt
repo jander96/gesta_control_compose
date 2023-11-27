@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.devj.gestantescontrolcompose.ui.screens.editionscreen
 
@@ -50,12 +50,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.domain.intents.EditionIntent
-import com.devj.gestantescontrolcompose.domain.model.Formulary
 import com.devj.gestantescontrolcompose.framework.ContactManager
 import com.devj.gestantescontrolcompose.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.ui.screens.common.AvatarImage
 import com.devj.gestantescontrolcompose.ui.screens.common.ImageSelectorRow
-import com.devj.gestantescontrolcompose.ui.screens.editionscreen.FormState.*
 import com.devj.gestantescontrolcompose.utils.convertToBitmap
 import com.devj.gestantescontrolcompose.utils.convertToString
 import kotlinx.coroutines.launch
@@ -72,15 +70,17 @@ fun EditionPage(
     val state = editionViewModel.viewState.collectAsStateWithLifecycle()
     var pregnant: PregnantUI? by remember { mutableStateOf(null) }
     pregnant = state.value.pregnant
-    val formState = rememberFormState(pregnant)
     val scope = rememberCoroutineScope()
     var image: Bitmap? by rememberSaveable { mutableStateOf(null) }
+    val contactManager = ContactManager(LocalContext.current)
+    val formState = FormState(pregnant)
+
 
     val camLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-            image = it;
+            image = it
             it?.let {
-                formState.changeInputValue(Companion.FieldKey.PHOTO,it.convertToString())
+                formState.changePhoto(it.convertToString())
             }
         }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()){
@@ -90,7 +90,7 @@ fun EditionPage(
 
     LaunchedEffect(pregnantId ){
         if(pregnantId != null && pregnantId != 0){
-            editionViewModel.intentFlow.emit(EditionIntent.GetPregnantById(pregnantId))
+            editionViewModel.intentFlow.emit(EditionIntent.LoadPregnant(pregnantId))
         }
     }
 
@@ -104,7 +104,7 @@ fun EditionPage(
     }
 
 
-    LazyColumn() {
+    LazyColumn {
         item {
             IconButton(onSaveTap) {
                 Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = null)
@@ -123,39 +123,15 @@ fun EditionPage(
         }
         item {
             FormularyEditor(
-                pregnantUI = pregnant,
-                modifier = Modifier,
-                onContactPick = {
-
-                },
-                formState = formState
+                formState = formState,
+                contactManager = contactManager,
             )
         }
         item {
             FilledTonalButton(modifier = Modifier.padding(32.dp),onClick = {
-                val form = Formulary(
-                    id = pregnantId ?: 0,
-                    name = formState.name.value,
-                    lastName = formState.lastName.value,
-                    age = formState.age.value,
-                    weight = formState.weight.value,
-                    size = formState.size.value,
-                    phoneNumber = formState.phone.value,
-                    fUM = formState.fum.value,
-                    isFUMReliable = formState.isFUMReliable.value,
-                    firstFUG = formState.firstUS.value,
-                    riskFactors = formState.riskFactors.value,
-                    notes = formState.notes.value,
-                    photo = formState.photo.value
-                )
                 scope.launch {
-                    editionViewModel.intentFlow.emit(EditionIntent.ValidateFormulary(form))
+                    editionViewModel.intentFlow.emit(EditionIntent.SaveDataPregnant(formState.getPregnant()))
                 }
-
-                scope.launch {
-                    editionViewModel.intentFlow.emit(EditionIntent.SaveDataPregnant(form))
-                }
-
 
             }) {
                 Text("Guardar", modifier = Modifier.fillMaxWidth())
@@ -189,34 +165,17 @@ fun HeaderEditor(
 @ExperimentalMaterial3Api
 @Composable
 fun FormularyEditor(
-    pregnantUI: PregnantUI? = null,
     modifier: Modifier = Modifier,
-    onContactPick: (String) -> Unit,
-    formState: FormState
+
+    formState: FormState = FormState(),
+    contactManager : ContactManager,
 ) {
 
-    val context = LocalContext.current
-    val showFumCalendar = formState.showFumCalendar.collectAsStateWithLifecycle()
-    val showUsCalendar = formState.showUsCalendar.collectAsStateWithLifecycle()
-    val isReliable = formState.isFUMReliable.collectAsStateWithLifecycle()
-    val name = formState.name.collectAsStateWithLifecycle()
-    val lastName = formState.lastName.collectAsStateWithLifecycle()
-    val age = formState.age.collectAsStateWithLifecycle()
-    val weight = formState.weight.collectAsStateWithLifecycle()
-    val size = formState.size.collectAsStateWithLifecycle()
-    val phone = formState.phone.collectAsStateWithLifecycle()
-    val firstUS = formState.firstUS.collectAsStateWithLifecycle()
-    val secondUS = formState.secondUS.collectAsStateWithLifecycle()
-    val thirdUS = formState.thirdUS.collectAsStateWithLifecycle()
-    val fum = formState.fum.collectAsStateWithLifecycle()
-    val riskFactors = formState.riskFactors.collectAsStateWithLifecycle()
-    val notes = formState.notes.collectAsStateWithLifecycle()
-    val contactManager = ContactManager(context)
 
     val contactLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickContact()){ uri->
         uri?.let{
             val numberPhone = contactManager.getContactFromUri(it)
-            formState.changeInputValue(Companion.FieldKey.PHONE, numberPhone ?: "")
+            formState.changePhone(numberPhone ?: "")
         }
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){isGranted->
@@ -228,85 +187,87 @@ fun FormularyEditor(
 
 
     Column(modifier = modifier.padding(16.dp)) {
-        if (showFumCalendar.value) Calendar(formState, onDateSelected = { date ->
-            date?.let{
-                formState.changeInputValue(Companion.FieldKey.FUM,it)
-            }
-        }, onClose = {formState.setFumCalendarVisibility(false)})
-        if (showUsCalendar.value) Calendar(formState, onDateSelected = { date ->
-            date?.let{
-                formState.changeInputValue(Companion.FieldKey.FIRST_US,it)
-            }
-        }, onClose = {formState.setUsCalendarVisibility(false)})
+        if (formState.showFumCalendar) Calendar(
+            onDateSelected = { it?.let{formState.changeFumDate(it)} },
+            onClose = { formState.changeFumCalendarVisibility(false) }
+        )
+        if (formState.showUsCalendar) Calendar(
+            onDateSelected = { it?.let{formState.changeUsDate(it)} },
+            onClose = { formState.changeUsCalendarVisibility(false) })
 
 //   Nombre y apellidos
         Row(horizontalArrangement = Arrangement.SpaceEvenly) {
             TextField(
-                value = name.value,
+                value = formState.name,
                 modifier = modifier
-                    .weight(1f)
+                    .weight(1.5f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.NAME, it) },
+                onValueChange = { formState.changeName(it) },
                 label = {
                     Text("nombre")
-                }
+                },
+                isError = formState.nameErrorMessage.value != null
+
             )
             TextField(
-                value = lastName.value,
+                value = formState.lastName,
                 modifier = modifier
                     .weight(2f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.LAST_NAME, it) },
+                onValueChange = { formState.changeLastname(it) },
                 label = {
                     Text("apellidos")
-                }
+                },
+                isError = formState.lastNameErrorMessage.value != null
             )
         }
 //   Edad, talla , peso
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
             TextField(
-
-                value = age.value,
+                value = formState.age,
                 modifier = modifier
                     .weight(1f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.AGE, it) },
+                onValueChange = { formState.changeAge(it) },
                 label = {
                     Text("edad")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = formState.ageErrorMessage.value != null
             )
             TextField(
-                value = size.value,
+                value = formState.size,
                 modifier = modifier
                     .weight(1f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.SIZE, it) },
+                onValueChange = {formState.changeSize(it) },
                 label = {
                     Text("talla")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = formState.sizeErrorMessage.value != null
             )
             TextField(
-                value = weight.value,
+                value = formState.weight,
                 modifier = modifier
                     .weight(1f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.WEIGHT, it) },
+                onValueChange ={formState.changeWeight(it)},
                 label = {
                     Text("peso")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = formState.weightErrorMessage.value != null
             )
         }
 
-        Row() {
+        Row{
             TextField(
-                value = phone.value,
+                value = formState.phone,
                 modifier = modifier
                     .weight(1f)
                     .padding(4.dp),
-                onValueChange = { formState.changeInputValue(Companion.FieldKey.PHONE, it) },
+                onValueChange = { formState.changePhone(it) },
                 label = {
                     Text("telefono")
                 },
@@ -320,6 +281,7 @@ fun FormularyEditor(
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                isError = formState.phoneErrorMessage.value != null
             )
         }
 
@@ -329,11 +291,11 @@ fun FormularyEditor(
                 TextField(
                     textStyle = MaterialTheme.typography.bodyMedium,
                     enabled = false,
-                    value = firstUS.value,
+                    value = formState.firstUS,
                     modifier = modifier
                         .padding(4.dp)
                         .clickable { },
-                    onValueChange = { formState.changeInputValue(Companion.FieldKey.FIRST_US, it) },
+                    onValueChange = {formState.changeUsDate(it)},
                     placeholder = {
                         Text("1er U/S")
                     },
@@ -341,7 +303,7 @@ fun FormularyEditor(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_calendar_24),
                             contentDescription = "",
-                            modifier = modifier.clickable { formState.setUsCalendarVisibility(true) }
+                            modifier = modifier.clickable { formState.changeUsCalendarVisibility(true) }
                         )
                     },
 
@@ -354,10 +316,10 @@ fun FormularyEditor(
             ) {
                 TextField(
                     enabled = false,
-                    value = fum.value,
+                    value = formState.fum,
                     modifier = modifier
                         .padding(4.dp),
-                    onValueChange = { formState.changeInputValue(Companion.FieldKey.FUM, it) },
+                    onValueChange = { formState.changeFumDate(it) },
                     placeholder = {
                         Text("FUM")
                     },
@@ -365,48 +327,50 @@ fun FormularyEditor(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_calendar_24),
                             contentDescription = "",
-                            modifier = modifier.clickable {formState.setFumCalendarVisibility(true) }
+                            modifier = modifier.clickable {formState.changeFumCalendarVisibility(true) }
                         )
                     }
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = isReliable.value,
-                        onCheckedChange = { formState.setReliability(it) })
-                    Text("Es confiable?")
+                        checked = formState.isFumReliable,
+                        onCheckedChange = { formState.onCheckboxChange(it) })
+                    Text("¿Es confiable?")
                 }
             }
         }
 
         TextField(
-            value = riskFactors.value,
+            value = formState.riskFactors,
             modifier = modifier
                 .padding(4.dp)
                 .fillMaxWidth(),
-            onValueChange = { formState.changeInputValue(Companion.FieldKey.RISK_FACTORS, it) },
+            onValueChange = {formState.changeRiskFactors(it)},
             label = {
                 Text("factores de riesgo")
             },
-            supportingText = { Text("separados por coma,") }
+            supportingText = { Text("separados por coma,") },
+            isError = formState.riskFactorsErrorMessage.value != null
         )
         TextField(
-            value = notes.value,
+            value = formState.notes,
             modifier = modifier
                 .padding(4.dp)
                 .fillMaxWidth(),
-            onValueChange = { formState.changeInputValue(Companion.FieldKey.NOTES, it) },
+            onValueChange = { formState.changeNote(it) },
             label = {
                 Text("notas")
-            }
+            },
+            isError = formState.notesErrorMessage.value != null
         )
 
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Calendar(
-    formState: FormState,
     onDateSelected :(String?)-> Unit,
     onClose :()-> Unit,
     ) {

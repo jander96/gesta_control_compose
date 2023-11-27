@@ -20,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -110,7 +109,7 @@ fun HomeHeader(
         ) {
             items(filteredPregnant){ pregnant->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    AvatarImage(size= 72.dp,image = pregnant.photo.convertToBitmap(), placeholder = R.drawable.profile)
+                    AvatarImage(size= 72.dp,image = if ( pregnant.photo.isNotEmpty() ) pregnant.photo.convertToBitmap() else null, placeholder = R.drawable.profile)
                     Text(pregnant.name, style = MaterialTheme.typography.bodySmall)
                 }
             }
@@ -138,10 +137,3 @@ fun HomeHeader(
     }
 }
 
-@ExperimentalMaterial3Api
-@Composable
-fun Drawer(modifier: Modifier) {
-    ModalDrawerSheet() {
-
-    }
-}
