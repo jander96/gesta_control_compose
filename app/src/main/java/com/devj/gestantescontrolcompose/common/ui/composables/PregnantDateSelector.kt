@@ -34,6 +34,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.devj.gestantescontrolcompose.R
 import java.time.Instant
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun PregnantDateSelector(
@@ -216,8 +217,9 @@ fun Calendar(
             ElevatedButton(onClick = {
                 val millis = pickerState.selectedDateMillis
                 val date = millis?.let {
+                    val formater = DateTimeFormatter.ISO_DATE
                     val localDate = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC")).toLocalDate()
-                    "${localDate.dayOfMonth}/${localDate.monthValue}/${localDate.year}"
+                    localDate.format(formater)
                 }
                 onDateSelected(date)
                 onClose()
