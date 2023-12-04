@@ -15,6 +15,8 @@ class FormState(
 
 ) {
 
+
+
     val id = mutableIntStateOf(0)
     private val _name =  mutableStateOf("")
     val name get() = _name.value
@@ -83,6 +85,8 @@ class FormState(
 
         }
     }
+
+
 
     fun buildPregnant(): Pregnant {
        return  Pregnant(

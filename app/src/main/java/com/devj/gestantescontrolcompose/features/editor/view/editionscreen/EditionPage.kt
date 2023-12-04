@@ -25,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
+import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
 import com.devj.gestantescontrolcompose.common.extensions.convertToString
 import com.devj.gestantescontrolcompose.common.service.ContactManager
@@ -61,6 +61,7 @@ import com.devj.gestantescontrolcompose.common.ui.composables.LottieAnimationLoa
 import com.devj.gestantescontrolcompose.common.ui.composables.PregnantDateSelector
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
+import com.devj.gestantescontrolcompose.features.editor.view.composables.Stepper
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
 import kotlinx.coroutines.launch
 
@@ -112,7 +113,7 @@ fun EditionPage(
     Scaffold(modifier = modifier.padding(horizontal = 16.dp)) { paddingValues ->
         val scrollState = rememberScrollState()
 
-        Box() {
+        Box(modifier = Modifier.fillMaxSize()) {
 
             Column(
                 modifier = Modifier
@@ -136,7 +137,12 @@ fun EditionPage(
                     },
                     onGalleryClick = {
                         galleryLauncher.launch("image")
-                    })
+                    },
+                    numberOfSteps = 3,
+                    currentStep = 2,
+
+                    )
+
 
                 FormularyEditor(
                     formState = formState,
@@ -185,7 +191,9 @@ fun HeaderEditor(
     image: Bitmap?,
     modifier: Modifier = Modifier,
     onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit
+    onGalleryClick: () -> Unit,
+    numberOfSteps: Int = 0,
+    currentStep: Int = 0,
 ) {
     Row {
         Box(modifier = modifier.padding(16.dp)) {
@@ -196,6 +204,8 @@ fun HeaderEditor(
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+
+        Stepper(numberOfSteps = numberOfSteps, currentStep = currentStep)
     }
 }
 
@@ -223,165 +233,172 @@ fun FormularyEditor(
             }
         }
 
-    var showFumQuestion by rememberSaveable {
-        mutableStateOf(false)
-    }
-
 
 
     Column {
-        Card(modifier = modifier) {
-            Column(modifier = modifier) {
-
-
-
-                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                    OutlinedTextField(
-                        value = formState.name,
-                        modifier = modifier
-                            .weight(1.5f)
-                            .fillMaxSize()
-                            .padding(4.dp),
-                        onValueChange = { formState.changeName(it) },
-                        label = {
-                            Text("nombre")
-                        },
-                        isError = formState.nameErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.nameErrorMessage.value != null) Text(
-                                formState.nameErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-
-                    )
-                    OutlinedTextField(
-                        value = formState.lastName,
-                        modifier = modifier
-                            .weight(2f)
-                            .padding(4.dp),
-                        onValueChange = { formState.changeLastname(it) },
-                        label = {
-                            Text("apellidos")
-                        },
-                        isError = formState.lastNameErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.lastNameErrorMessage.value != null) Text(
-                                formState.lastNameErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    )
-                }
-
-                Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    OutlinedTextField(
-                        value = formState.age,
-                        modifier = modifier
-                            .weight(1f)
-                            .padding(4.dp),
-                        onValueChange = { formState.changeAge(it) },
-                        label = {
-                            Text("edad")
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = formState.ageErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.ageErrorMessage.value != null) Text(
-                                formState.ageErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    )
-                    OutlinedTextField(
-                        value = formState.size,
-                        modifier = modifier
-                            .weight(1f)
-                            .padding(4.dp),
-                        onValueChange = { formState.changeSize(it) },
-                        label = {
-                            Text("talla")
-                        },
-                        suffix = { Text("cm") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        isError = formState.sizeErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.sizeErrorMessage.value != null) Text(
-                                formState.sizeErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    )
-                    OutlinedTextField(
-                        value = formState.weight,
-                        modifier = modifier
-                            .weight(1f)
-                            .padding(4.dp),
-                        onValueChange = { formState.changeWeight(it) },
-                        label = {
-                            Text("peso")
-                        },
-                        suffix = { Text("kg") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        isError = formState.weightErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.weightErrorMessage.value != null) Text(
-                                formState.weightErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    )
-                }
-
-                Row {
-                    OutlinedTextField(
-                        value = formState.phone,
-                        modifier = modifier
-                            .weight(1f)
-                            .padding(4.dp),
-                        onValueChange = { formState.changePhone(it) },
-                        label = {
-                            Text("telefono")
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_contacts_svg),
-                                contentDescription = "",
-                                modifier = modifier
-                                    .padding(16.dp)
-                                    .clickable {
-                                        permissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                                    }
-                                    .size(24.dp)
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        isError = formState.phoneErrorMessage.value != null,
-                        supportingText = {
-                            if (formState.phoneErrorMessage.value != null) Text(
-                                formState.phoneErrorMessage.value!!,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    )
-                }
-
-            }
-
-
-        }
 
         ExpandableSection(
             modifier = Modifier.fillMaxWidth(),
             leading = {
                 LottieAnimationLoader(
-                    rawRes = R.raw.calendar_lottie_animation,
+                    rawRes = R.raw.lottie_edit,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            content = {
+                Column() {
+
+                    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                        OutlinedTextField(
+                            value = formState.name,
+                            modifier = modifier
+                                .weight(1.5f)
+                                .fillMaxSize()
+                                .padding(4.dp),
+                            onValueChange = { formState.changeName(it) },
+                            label = {
+                                Text("nombre")
+                            },
+                            isError = formState.nameErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.nameErrorMessage.value != null) Text(
+                                    formState.nameErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+
+                        )
+                        OutlinedTextField(
+                            value = formState.lastName,
+                            modifier = modifier
+                                .weight(2f)
+                                .padding(4.dp),
+                            onValueChange = { formState.changeLastname(it) },
+                            label = {
+                                Text("apellidos")
+                            },
+                            isError = formState.lastNameErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.lastNameErrorMessage.value != null) Text(
+                                    formState.lastNameErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        )
+                    }
+
+                    Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                        OutlinedTextField(
+                            value = formState.age,
+                            modifier = modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            onValueChange = { formState.changeAge(it) },
+                            label = {
+                                Text("edad")
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = formState.ageErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.ageErrorMessage.value != null) Text(
+                                    formState.ageErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        )
+                        OutlinedTextField(
+                            value = formState.size,
+                            modifier = modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            onValueChange = { formState.changeSize(it) },
+                            label = {
+                                Text("talla")
+                            },
+                            suffix = { Text("cm") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            isError = formState.sizeErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.sizeErrorMessage.value != null) Text(
+                                    formState.sizeErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        )
+                        OutlinedTextField(
+                            value = formState.weight,
+                            modifier = modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            onValueChange = { formState.changeWeight(it) },
+                            label = {
+                                Text("peso")
+                            },
+                            suffix = { Text("kg") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            isError = formState.weightErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.weightErrorMessage.value != null) Text(
+                                    formState.weightErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        )
+                    }
+
+                    Row {
+                        OutlinedTextField(
+                            value = formState.phone,
+                            modifier = modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            onValueChange = { formState.changePhone(it) },
+                            label = {
+                                Text("telefono")
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_contacts_svg),
+                                    contentDescription = "",
+                                    modifier = modifier
+                                        .padding(16.dp)
+                                        .clickable {
+                                            permissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                                        }
+                                        .size(24.dp)
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            isError = formState.phoneErrorMessage.value != null,
+                            supportingText = {
+                                if (formState.phoneErrorMessage.value != null) Text(
+                                    formState.phoneErrorMessage.value!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        )
+                    }
+
+                }
+            },
+            text = "Datos generales" )
+
+
+
+
+        Spacer16()
+
+        ExpandableSection(
+            modifier = Modifier.fillMaxWidth(),
+            leading = {
+                LottieAnimationLoader(
+                    rawRes = R.raw.lottie_calendar,
                     modifier = Modifier.size(48.dp)
                 )
             },
