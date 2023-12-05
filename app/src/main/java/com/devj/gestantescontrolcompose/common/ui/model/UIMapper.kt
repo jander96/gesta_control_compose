@@ -72,7 +72,7 @@ class UIMapper @Inject constructor(
                     dataDate.fUM,
                     USData(dataDate.firstFUG, dataDate.firstUSWeeks, dataDate.firstUSDays)
                 ),
-                riskClassification =        getRiskClassification (pregnant.riskFactors),
+                riskClassification =     pregnant.riskClassification,
                 listOfRiskFactors = if (pregnant.riskFactors != null)
                     getStringFromList(pregnant.riskFactors)
                 else "",
@@ -91,9 +91,8 @@ class UIMapper @Inject constructor(
         val imc = weight / (sizeInMeters * sizeInMeters)
         return formatter.format(imc).toString()
     }
-    private fun getRiskClassification(listOfRisk: List<RiskFactor>?): String {
-        return if (listOfRisk != null && listOfRisk.size > 2) "Alto riesgo" else "Bajo riesgo"
-    }
+
+
 
     private fun getStringFromList(listOfRiskFactors: List<RiskFactor>): String {
         return listOfRiskFactors.joinToString("/ ") { it.name }

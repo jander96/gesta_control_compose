@@ -21,5 +21,7 @@ interface PregnantDao {
 
     @Query("DELETE From pregnant_table Where id == :pregnantId")
     suspend fun deletePregnantById(pregnantId: Int)
+    @Query("SELECT * FROM pregnant_table WHERE name LIKE :query OR last_name LIKE :query")
+    fun searchByName(query: String):Flow<List<PregnantEntity>>
 
 }

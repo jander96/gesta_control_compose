@@ -2,6 +2,7 @@ package com.devj.gestantescontrolcompose.common.ui.model
 
 
 import android.os.Parcelable
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import kotlinx.parcelize.Parcelize
 @Parcelize
 data class PregnantUI(
@@ -23,7 +24,7 @@ data class PregnantUI(
     val thirdUS : String,
     val gestationalAgeByThirdUS: String,
     val fpp : String,
-    val riskClassification: String,
+    val riskClassification: RiskClassification,
     val listOfRiskFactors: String,
     val notes: String,
     val photo: String,

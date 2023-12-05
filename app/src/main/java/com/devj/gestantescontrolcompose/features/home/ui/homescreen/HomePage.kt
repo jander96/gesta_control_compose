@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
@@ -48,13 +47,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.SpacerBy
-import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
-import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.ui.theme.deepPurple
+import com.devj.gestantescontrolcompose.common.ui.theme.hardPink
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
+import com.devj.gestantescontrolcompose.features.home.domain.model.Stats
 import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialog
 import com.devj.gestantescontrolcompose.features.home.ui.composables.RecyclerItem
+import com.devj.gestantescontrolcompose.features.home.ui.composables.StatCard
 import com.devj.gestantescontrolcompose.features.home.ui.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 
@@ -105,13 +107,24 @@ fun HomePage(
 
             ) {
             HomeHeader(
-                filteredPregnant =
-                if (listOfPregnant.value.size > 3)
-                    listOfPregnant.value.takeLast(3)
-                else listOfPregnant.value
-            ){filterItem->
+                stats = Stats(
+                    total = listOfPregnant.value.size,
+                    onRisk = listOfPregnant.value.count { it.riskClassification == RiskClassification.HEIGHT_RISK },
+                    onFinalPeriod = listOfPregnant.value.count {
+                        if (it.isFUMReliable) {
+                            it.gestationalAgeByFUM.toFloat() >= 37.0
+                        } else {
+                            it.gestationalAgeByFirstUS.toFloat() >= 37.0
+                        }
+                    },
+                ),
+                onFilterClick = {filterItem->
 
-            }
+                },
+                onSearch = {query->
+                    scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnSearch(query)) }
+                }
+            )
         }
         Surface(
             modifier = Modifier
@@ -184,8 +197,9 @@ fun FAB(onClick: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun HomeHeader(
     modifier: Modifier = Modifier,
-    filteredPregnant: List<PregnantUI> = emptyList(),
-    onFilterClick: (String)->Unit
+    stats: Stats = Stats(),
+    onFilterClick: (String)->Unit,
+    onSearch: (String)->Unit,
 ) {
     val withScreen = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
@@ -217,7 +231,10 @@ fun HomeHeader(
                         .width((withScreen * 0.6).dp)
                         .height(48.dp),
                     shape = MaterialTheme.shapes.small.copy(CornerSize(50.dp)),
-                    onValueChange = { query = it },
+                    onValueChange = {
+                        query = it
+                        onSearch(it)
+                    },
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
@@ -266,30 +283,23 @@ fun HomeHeader(
 
         }
 
-        if (filteredPregnant.isNotEmpty())
-            Text(
-                "Recientes",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = modifier.padding(bottom = 12.dp, top = 8.dp)
-            )
-        LazyRow(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.Center,
+
+        Text(
+            "Estadisticas",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = modifier.padding(bottom = 12.dp, top = 8.dp)
+        )
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            items(filteredPregnant) { pregnant ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    AvatarImage(
-                        size = 40.dp,
-                        image = if (pregnant.photo.isNotEmpty()) pregnant.photo.convertToBitmap() else null,
-                        placeholder = R.drawable.profile
-                    )
-                    Text(pregnant.name, style = MaterialTheme.typography.labelSmall)
-                }
-            }
+            StatCard(value = stats.total, label = "Total", cardColor = deepPurple, size = 68.dp)
+            StatCard(value = stats.onRisk, label = "De riesgo", cardColor = hardPink, elevation = 6.dp)
+            StatCard(value = stats.onFinalPeriod, label = "A término", cardColor = deepPurple, size = 68.dp)
+
         }
         Spacer(modifier = Modifier.height(16.dp))
 

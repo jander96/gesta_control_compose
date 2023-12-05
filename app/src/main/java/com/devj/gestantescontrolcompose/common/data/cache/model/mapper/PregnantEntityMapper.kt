@@ -3,6 +3,7 @@ package com.devj.gestantescontrolcompose.common.data.cache.model.mapper
 import com.devj.gestantescontrolcompose.common.data.cache.model.PregnantEntity
 import com.devj.gestantescontrolcompose.common.domain.model.Measures
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import javax.inject.Inject
 
 class PregnantEntityMapper @Inject constructor(
@@ -20,7 +21,8 @@ class PregnantEntityMapper @Inject constructor(
             dataDate = dataDateEmbeddedMapper.mapToDomain(cacheEntity.dataDate),
             riskFactors = cacheEntity.riskFactors?.map { riskFactorEmbeddedMapper.mapToDomain(it) },
             notes = cacheEntity.notes,
-            photo = cacheEntity.photo
+            photo = cacheEntity.photo,
+            riskClassification = RiskClassification.fromLevel(cacheEntity.riskClassification)
         )
     }
 }

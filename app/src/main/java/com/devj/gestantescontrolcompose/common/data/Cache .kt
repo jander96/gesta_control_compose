@@ -13,4 +13,6 @@ interface Cache {
     suspend fun deletePregnant(pregnant: PregnantEntity)
 
     suspend fun deletePregnantById(pregnantId: Int)
+
+    suspend fun searchByName(query: String):Flow<List<PregnantEntity>>
 }

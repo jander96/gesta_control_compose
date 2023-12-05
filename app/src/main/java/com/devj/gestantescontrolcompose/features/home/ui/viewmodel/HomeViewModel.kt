@@ -9,6 +9,7 @@ import com.devj.gestantescontrolcompose.features.home.domain.HomeAction
 import com.devj.gestantescontrolcompose.features.home.domain.HomeEffect
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
 import com.devj.gestantescontrolcompose.features.home.domain.mapToAction
+import com.devj.gestantescontrolcompose.features.home.domain.use_case.SearchByName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getAllPregnant: GetAllPregnant,
     private val deletePregnant: DeletePregnantById,
-    private val uiMapper: UIMapper
+    private val uiMapper: UIMapper,
+    private val search: SearchByName,
 ) : ViewModel() {
 
 
@@ -51,6 +53,7 @@ class HomeViewModel @Inject constructor(
         return when (action) {
             HomeAction.LoadListPregnant -> getAllPregnant()
             is HomeAction.DeletePregnant -> deletePregnant(action.id)
+            is HomeAction.Search -> search(action.query)
         }
     }
     private fun reduceState(oldState: HomeViewState, effect: HomeEffect): HomeViewState {
@@ -88,7 +91,7 @@ class HomeViewModel @Inject constructor(
                           uiMapper.fromDomain(it)
                         }
                     },
-                    isDataBaseEmpty = false
+                    isDataBaseEmpty = false,
                 )
             }
 
@@ -96,6 +99,19 @@ class HomeViewModel @Inject constructor(
                 oldState.copy(
                     error = null,
                     isLoading = false,
+                )
+            }
+
+            is HomeEffect.PregnantListUpdate.SearchResult -> {
+                oldState.copy(
+                    error = null,
+                    isLoading = false,
+                    pregnantList = effect.listOfPregnant.map { pregnantList ->
+                        pregnantList.map {
+                            uiMapper.fromDomain(it)
+                        }
+                    },
+                    isDataBaseEmpty = false
                 )
             }
         }

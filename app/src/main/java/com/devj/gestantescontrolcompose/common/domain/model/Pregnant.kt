@@ -11,7 +11,8 @@ data class Pregnant(
     val dataDate: DataDate,
     val riskFactors: List<RiskFactor>? = null,
     val notes: String? = null,
-    val photo: String? = null
+    val photo: String? = null,
+    val riskClassification: RiskClassification = RiskClassification.LOW_RISK
 )
 
 

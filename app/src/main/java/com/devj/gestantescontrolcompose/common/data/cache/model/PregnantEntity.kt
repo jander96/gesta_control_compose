@@ -26,7 +26,9 @@ data class PregnantEntity(
     @ColumnInfo(name = "risk_factors")
     val riskFactors: List<RiskFactorEmbedded>?,
     val notes: String?,
-    val photo: String?
+    val photo: String?,
+    @ColumnInfo(name = "risk_classification")
+    val riskClassification: Int = 0
 ) {
     companion object {
         fun fromDomain(pregnant: Pregnant): PregnantEntity {
@@ -40,7 +42,8 @@ data class PregnantEntity(
                 dataDate = DataDateEmbedded.fromDomain(pregnant.dataDate),
                 riskFactors = pregnant.riskFactors?.map { RiskFactorEmbedded.fromDomain(it) },
                 notes = pregnant.notes,
-                photo = pregnant.photo
+                photo = pregnant.photo,
+                riskClassification = pregnant.riskClassification.level
             )
         }
     }

@@ -38,6 +38,14 @@ class PregnantRepositoryImp @Inject constructor(
         cache.deletePregnantById(pregnantId)
     }
 
+    override suspend fun searchByName(query: String): Flow<List<Pregnant>> {
+        return cache.searchByName(query).map { list ->
+            list.map {
+                cacheMapper.mapToDomain(it)
+            }
+        }
+    }
+
 }
 
 

@@ -7,6 +7,7 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.clickable
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
 import com.devj.gestantescontrolcompose.common.extensions.convertToString
@@ -57,11 +59,11 @@ import com.devj.gestantescontrolcompose.common.service.ContactManager
 import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.composables.ExpandableSection
 import com.devj.gestantescontrolcompose.common.ui.composables.ImageSelectorRow
-import com.devj.gestantescontrolcompose.common.ui.composables.LottieAnimationLoader
 import com.devj.gestantescontrolcompose.common.ui.composables.PregnantDateSelector
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
-import com.devj.gestantescontrolcompose.features.editor.view.composables.Stepper
+import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
+import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
 import kotlinx.coroutines.launch
 
@@ -90,9 +92,17 @@ fun EditionPage(
                 formState.changePhoto(it.convertToString())
             }
         }
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
 
-    }
+            if (it != null) {
+
+
+            } else {
+
+            }
+
+        }
 
 
     LaunchedEffect(pregnantId) {
@@ -130,19 +140,19 @@ fun EditionPage(
 
 
                 HeaderEditor(
+                    modifier = Modifier.padding(16.dp),
                     image = if (state.value.pregnant?.photo?.isNotEmpty() == true) state.value.pregnant?.photo?.convertToBitmap() else image,
-                    modifier = Modifier,
                     onCameraClick = {
                         camLauncher.launch()
                     },
                     onGalleryClick = {
-                        galleryLauncher.launch("image")
+                        galleryLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
                     },
-                    numberOfSteps = 3,
-                    currentStep = 2,
-
-                    )
-
+                )
 
                 FormularyEditor(
                     formState = formState,
@@ -192,11 +202,9 @@ fun HeaderEditor(
     modifier: Modifier = Modifier,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
-    numberOfSteps: Int = 0,
-    currentStep: Int = 0,
 ) {
-    Row {
-        Box(modifier = modifier.padding(16.dp)) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Box() {
             AvatarImage(image = image, placeholder = R.drawable.profile)
             ImageSelectorRow(
                 onGalleryClick = onGalleryClick,
@@ -205,7 +213,7 @@ fun HeaderEditor(
             )
         }
 
-        Stepper(numberOfSteps = numberOfSteps, currentStep = currentStep)
+
     }
 }
 
@@ -240,9 +248,12 @@ fun FormularyEditor(
         ExpandableSection(
             modifier = Modifier.fillMaxWidth(),
             leading = {
-                LottieAnimationLoader(
-                    rawRes = R.raw.lottie_edit,
-                    modifier = Modifier.size(48.dp)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_edit_svg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(24.dp),
                 )
             },
             content = {
@@ -250,6 +261,7 @@ fun FormularyEditor(
 
                     Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.name,
                             modifier = modifier
                                 .weight(1.5f)
@@ -257,7 +269,7 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeName(it) },
                             label = {
-                                Text("nombre")
+                                Text("nombre", style = MaterialTheme.typography.labelMedium)
                             },
                             isError = formState.nameErrorMessage.value != null,
                             supportingText = {
@@ -270,13 +282,14 @@ fun FormularyEditor(
 
                         )
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.lastName,
                             modifier = modifier
                                 .weight(2f)
                                 .padding(4.dp),
                             onValueChange = { formState.changeLastname(it) },
                             label = {
-                                Text("apellidos")
+                                Text("apellidos", style = MaterialTheme.typography.labelMedium)
                             },
                             isError = formState.lastNameErrorMessage.value != null,
                             supportingText = {
@@ -291,13 +304,14 @@ fun FormularyEditor(
 
                     Row(horizontalArrangement = Arrangement.SpaceBetween) {
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.age,
                             modifier = modifier
                                 .weight(1f)
                                 .padding(4.dp),
                             onValueChange = { formState.changeAge(it) },
                             label = {
-                                Text("edad")
+                                Text("edad", style = MaterialTheme.typography.labelMedium)
                             },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = formState.ageErrorMessage.value != null,
@@ -310,13 +324,14 @@ fun FormularyEditor(
                             }
                         )
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.size,
                             modifier = modifier
                                 .weight(1f)
                                 .padding(4.dp),
                             onValueChange = { formState.changeSize(it) },
                             label = {
-                                Text("talla")
+                                Text("talla", style = MaterialTheme.typography.labelMedium)
                             },
                             suffix = { Text("cm") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -330,13 +345,14 @@ fun FormularyEditor(
                             }
                         )
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.weight,
                             modifier = modifier
                                 .weight(1f)
                                 .padding(4.dp),
                             onValueChange = { formState.changeWeight(it) },
                             label = {
-                                Text("peso")
+                                Text("peso", style = MaterialTheme.typography.labelMedium)
                             },
                             suffix = { Text("kg") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -353,13 +369,14 @@ fun FormularyEditor(
 
                     Row {
                         OutlinedTextField(
+                            textStyle = MaterialTheme.typography.labelMedium,
                             value = formState.phone,
                             modifier = modifier
                                 .weight(1f)
                                 .padding(4.dp),
                             onValueChange = { formState.changePhone(it) },
                             label = {
-                                Text("telefono")
+                                Text("telefono", style = MaterialTheme.typography.labelMedium)
                             },
                             leadingIcon = {
                                 Icon(
@@ -387,7 +404,8 @@ fun FormularyEditor(
 
                 }
             },
-            text = "Datos generales" )
+            text = "Datos generales"
+        )
 
 
 
@@ -397,9 +415,12 @@ fun FormularyEditor(
         ExpandableSection(
             modifier = Modifier.fillMaxWidth(),
             leading = {
-                LottieAnimationLoader(
-                    rawRes = R.raw.lottie_calendar,
-                    modifier = Modifier.size(48.dp)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_calendar_search_svg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(24.dp),
                 )
             },
             content = {
@@ -410,15 +431,42 @@ fun FormularyEditor(
                     days = formState.firstUSDays,
                     onWeekChange = { formState.changeUsWeeks(it) },
                     onDaysChange = { formState.changeUsDays(it) },
-                    onFumDateSelected = {formState.changeFumDate(it)},
+                    onFumDateSelected = { formState.changeFumDate(it) },
                     onUsDateSelected = { formState.changeUsDate(it) },
-                    onCheckboxChange = {formState.onCheckboxChange(it)},
+                    onCheckboxChange = { formState.onCheckboxChange(it) },
                     isFumReliable = formState.isFumReliable,
                     weekErrorMessage = formState.weeksErrorMessage.value,
                     daysErrorMessage = formState.daysErrorMessage.value,
                 )
             },
-            text = "Escoge el seguimiento adecuado" )
+            text = "Escoge el seguimiento adecuado"
+        )
+        Spacer16()
+
+        ExpandableSection(
+            modifier = Modifier.fillMaxWidth(),
+            leading = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_radio_button_group_svg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(24.dp)
+                )
+            },
+            content = {
+                RadioButtonsGroup(
+                    selectedIndexByDefault = formState.riskClassification.value.level,
+                    options = setOf(
+                        RadioOption("Bajo riesgo", RiskClassification.LOW_RISK),
+                        RadioOption("Alto riesgo", RiskClassification.HEIGHT_RISK),
+                    ),
+                    onSelect = { classification ->
+                        formState.changeRiskClassification(classification)
+                    })
+            },
+            text = "Clasificación de riesgo"
+        )
 
     }
 }

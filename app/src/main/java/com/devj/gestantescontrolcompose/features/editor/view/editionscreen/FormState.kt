@@ -8,6 +8,7 @@ import androidx.core.text.isDigitsOnly
 import com.devj.gestantescontrolcompose.common.domain.model.DataDate
 import com.devj.gestantescontrolcompose.common.domain.model.Measures
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 
 
@@ -62,6 +63,10 @@ class FormState(
     private val _isFumReliable: MutableState<Boolean> = mutableStateOf(false)
     val isFumReliable get() = _isFumReliable.value
 
+    private var _riskClassification = mutableStateOf(RiskClassification.LOW_RISK)
+    val riskClassification get() = _riskClassification
+
+
 
 
 
@@ -78,10 +83,9 @@ class FormState(
             _fum.value = pregnant.fum
             _isFumReliable.value = pregnant.isFUMReliable
             _photo.value = pregnant.photo
-
+            _riskClassification.value = pregnant.riskClassification
            _firstUsWeeks.value =  pregnant.firstUSWeeks
            _firstUSDays.value =  pregnant.firstUSDays
-
 
         }
     }
@@ -104,6 +108,7 @@ class FormState(
                 firstUSDays = if(firstUSDays.isNotEmpty()) firstUSDays.toInt() else null
             ),
             photo = photo,
+           riskClassification = _riskClassification.value
 
         )
     }
@@ -127,11 +132,22 @@ class FormState(
             size,
             weight,
         )
-        val hasDate = (fum.isNotEmpty() || firstUS.isNotEmpty())
+        val hasDate = (
+                fum.isNotEmpty() || (
+                        firstUS.isNotEmpty() &&
+                                firstUSDays.isNotBlank() &&
+                                firstUsWeeks.isNotBlank()
+                        )
+                )
+
+        val isInsecureCalculateGestationalAge =
+            (fum.isNotBlank() && !isFumReliable) &&
+                    (firstUS.isBlank() || firstUSDays.isBlank() || firstUsWeeks.isBlank())
 
         return errors.all { message -> message == null } &&
                 requiredFields.none { it.isBlank() } &&
-                hasDate
+                hasDate &&
+                !isInsecureCalculateGestationalAge
     }
     fun validateAllRequiredFields(){
         validateName(name)
@@ -243,5 +259,9 @@ class FormState(
 
     fun changePhoto(photo: String){
         _photo.value = photo
+    }
+
+    fun changeRiskClassification(classification: RiskClassification){
+        _riskClassification.value = classification
     }
 }

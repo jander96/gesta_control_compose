@@ -13,6 +13,7 @@ sealed class HomeEffect {
         object EmptyResponse : HomeEffect()
         data class Error(val throwable: Throwable?) : HomeEffect()
         data class Success(val listOfPregnant: Flow<List<Pregnant>>) : HomeEffect()
+        data class SearchResult(val listOfPregnant: Flow<List<Pregnant>>) : HomeEffect()
 
         object DeleteSuccessfully : HomeEffect()
 

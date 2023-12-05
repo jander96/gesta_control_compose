@@ -9,5 +9,5 @@ data class HomeViewState(
     val isLoading : Boolean = true,
     val isDataBaseEmpty: Boolean = false,
     val pregnantList: Flow<List<PregnantUI>> = flowOf(emptyList()),
-    val error : Throwable? = null
+    val error : Throwable? = null,
 )

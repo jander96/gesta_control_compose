@@ -14,4 +14,6 @@ interface PregnantRepository {
     suspend fun deletePregnant(pregnant: Pregnant)
 
     suspend fun deletePregnantById(pregnantId: Int)
+
+    suspend fun searchByName(query: String):Flow<List<Pregnant>>
 }
