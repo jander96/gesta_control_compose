@@ -33,7 +33,7 @@ class UIMapper @Inject constructor(
                 isFUMReliable = dataDate.isFUMReliable,
                 fum = dataDate.fUM ?: "",
                 gestationalAgeByFUM = if (!dataDate.fUM.isNullOrEmpty())
-                    calculateByFUM(dataDate.fUM)
+                    calculateByFUM(dataDate.fUM) ?: "+42"
                 else "",
                 dataDate.firstFUG ?: "",
                 gestationalAgeByFirstUS = if (dataDate.firstFUG != null &&
@@ -44,7 +44,7 @@ class UIMapper @Inject constructor(
                         dataDate.firstFUG,
                         dataDate.firstUSWeeks,
                         dataDate.firstUSDays,
-                    )
+                    )  ?: "+42"
                 else "",
                 secondUS = dataDate.secondFUG ?: "",
                gestationalAgeBySecondUS =  if (dataDate.secondFUG != null &&
@@ -55,7 +55,7 @@ class UIMapper @Inject constructor(
                         dataDate.secondFUG,
                         dataDate.secondUSWeeks,
                         dataDate.secondUSDays,
-                    )
+                    ) ?: "+42"
                 else "",
                 thirdUS = dataDate.secondFUG ?: "",
                 gestationalAgeByThirdUS = if (dataDate.thirdFUG != null &&
@@ -66,7 +66,7 @@ class UIMapper @Inject constructor(
                         dataDate.thirdFUG,
                         dataDate.thirdUSWeeks,
                         dataDate.thirdUSDays,
-                    )
+                    )  ?: "+42"
                 else "",
                fpp =  calculateFPP(
                     dataDate.fUM,

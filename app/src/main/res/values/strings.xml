@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">GestantesControlCompose</string>
+    <string name="stats">Estadísticas</string>
+    <string name="search_bar">search bar</string>
+    <string name="filter">filter</string>
+    <string name="higth_risk">Alto Riesgo</string>
+    <string name="total">Total</string>
+    <string name="on_risk">De riesgo</string>
+    <string name="on_last_period">A término</string>
+    <string name="home">Home</string>
+    <string name="calculator">Calculadora</string>
+    <string name="scheduler">Progamador</string>
+    <string name="invalid_form">Formulario inválido</string>
+    <string name="save">Guardar</string>
+    <string name="name">nombre</string>
+    <string name="lastname">apellidos</string>
+    <string name="age">edad</string>
+    <string name="size">talla</string>
+    <string name="cm">cm</string>
+    <string name="weight">peso</string>
+    <string name="kg">kg</string>
+    <string name="phone">teléfono</string>
+    <string name="general_data">Datos generales</string>
+    <string name="rigth_method">Escoge el seguimiento adecuado</string>
+    <string name="low_risk">Bajo Riesgo</string>
+    <string name="risk_classification">Clasificación de riesgo</string>
+    <string name="fum_calculator_tilte">Calcula la edad gestacional usando la fecha de última menstruación</string>
+    <string name="us_calculator_title">Calcula la edad gestacional usando el ultrasonido genético</string>
+    <string name="calculate">Calcular</string>
+    <string name="fum">FUM</string>
+    <string name="usg">USG</string>
+    <string name="us_calculator_subtitle">Ingrese la E.G que tenía cuando se realizó el u/s genético del bebé</string>
+    <string name="confirm">Confirmar</string>
 </resources>

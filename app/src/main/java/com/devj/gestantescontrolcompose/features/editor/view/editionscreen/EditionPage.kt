@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -182,12 +183,12 @@ fun EditionPage(
                             )
                         }
                     } else {
-                        Toast.makeText(context, "Formulario invalido", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Formulario inválido", Toast.LENGTH_LONG).show()
                     }
 
 
                 }) {
-                Text("Guardar")
+                Text(stringResource(R.string.save))
             }
 
         }
@@ -212,8 +213,6 @@ fun HeaderEditor(
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
-
-
     }
 }
 
@@ -269,7 +268,7 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeName(it) },
                             label = {
-                                Text("nombre", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.name), style = MaterialTheme.typography.labelMedium)
                             },
                             isError = formState.nameErrorMessage.value != null,
                             supportingText = {
@@ -289,7 +288,7 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeLastname(it) },
                             label = {
-                                Text("apellidos", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.lastname), style = MaterialTheme.typography.labelMedium)
                             },
                             isError = formState.lastNameErrorMessage.value != null,
                             supportingText = {
@@ -311,7 +310,7 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeAge(it) },
                             label = {
-                                Text("edad", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.age), style = MaterialTheme.typography.labelMedium)
                             },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = formState.ageErrorMessage.value != null,
@@ -331,9 +330,9 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeSize(it) },
                             label = {
-                                Text("talla", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.size), style = MaterialTheme.typography.labelMedium)
                             },
-                            suffix = { Text("cm") },
+                            suffix = { Text(stringResource(R.string.cm)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             isError = formState.sizeErrorMessage.value != null,
                             supportingText = {
@@ -352,9 +351,9 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changeWeight(it) },
                             label = {
-                                Text("peso", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.weight), style = MaterialTheme.typography.labelMedium)
                             },
-                            suffix = { Text("kg") },
+                            suffix = { Text(stringResource(R.string.kg)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             isError = formState.weightErrorMessage.value != null,
                             supportingText = {
@@ -376,7 +375,7 @@ fun FormularyEditor(
                                 .padding(4.dp),
                             onValueChange = { formState.changePhone(it) },
                             label = {
-                                Text("telefono", style = MaterialTheme.typography.labelMedium)
+                                Text(stringResource(R.string.phone), style = MaterialTheme.typography.labelMedium)
                             },
                             leadingIcon = {
                                 Icon(
@@ -404,7 +403,7 @@ fun FormularyEditor(
 
                 }
             },
-            text = "Datos generales"
+            text = stringResource(R.string.general_data)
         )
 
 
@@ -439,7 +438,7 @@ fun FormularyEditor(
                     daysErrorMessage = formState.daysErrorMessage.value,
                 )
             },
-            text = "Escoge el seguimiento adecuado"
+            text = stringResource(R.string.rigth_method)
         )
         Spacer16()
 
@@ -458,14 +457,14 @@ fun FormularyEditor(
                 RadioButtonsGroup(
                     selectedIndexByDefault = formState.riskClassification.value.level,
                     options = setOf(
-                        RadioOption("Bajo riesgo", RiskClassification.LOW_RISK),
-                        RadioOption("Alto riesgo", RiskClassification.HEIGHT_RISK),
+                        RadioOption(stringResource(R.string.low_risk), RiskClassification.LOW_RISK),
+                        RadioOption(stringResource(R.string.higth_risk), RiskClassification.HEIGHT_RISK),
                     ),
                     onSelect = { classification ->
                         formState.changeRiskClassification(classification)
                     })
             },
-            text = "Clasificación de riesgo"
+            text = stringResource(R.string.risk_classification)
         )
 
     }

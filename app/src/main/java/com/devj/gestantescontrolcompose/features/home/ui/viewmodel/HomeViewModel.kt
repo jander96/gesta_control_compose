@@ -9,6 +9,7 @@ import com.devj.gestantescontrolcompose.features.home.domain.HomeAction
 import com.devj.gestantescontrolcompose.features.home.domain.HomeEffect
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
 import com.devj.gestantescontrolcompose.features.home.domain.mapToAction
+import com.devj.gestantescontrolcompose.features.home.domain.use_case.FilterList
 import com.devj.gestantescontrolcompose.features.home.domain.use_case.SearchByName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,6 +28,8 @@ class HomeViewModel @Inject constructor(
     private val deletePregnant: DeletePregnantById,
     private val uiMapper: UIMapper,
     private val search: SearchByName,
+    private val filterList: FilterList,
+
 ) : ViewModel() {
 
 
@@ -54,8 +57,10 @@ class HomeViewModel @Inject constructor(
             HomeAction.LoadListPregnant -> getAllPregnant()
             is HomeAction.DeletePregnant -> deletePregnant(action.id)
             is HomeAction.Search -> search(action.query)
+            is HomeAction.Filter -> filterList(action.filter)
         }
     }
+
     private fun reduceState(oldState: HomeViewState, effect: HomeEffect): HomeViewState {
         return when (effect) {
             HomeEffect.PregnantListUpdate.Loading -> {
@@ -112,6 +117,20 @@ class HomeViewModel @Inject constructor(
                         }
                     },
                     isDataBaseEmpty = false
+                )
+            }
+
+            is HomeEffect.PregnantListUpdate.ApplyFilter -> {
+                oldState.copy(
+                    error = null,
+                    isLoading = false,
+                    pregnantList = effect.listOfPregnant.map { pregnantList ->
+                        pregnantList.map {
+                            uiMapper.fromDomain(it)
+                        }
+                    },
+                    isDataBaseEmpty = false,
+                    activeFilter = effect.filter
                 )
             }
         }

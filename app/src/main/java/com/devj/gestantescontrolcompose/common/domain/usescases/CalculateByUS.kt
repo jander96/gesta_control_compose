@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 class CalculateByUS @Inject constructor(private val dateCalculator: DateCalculator) {
 
-    operator fun invoke(date: String,weeks: Int, days: Int): String {
+    operator fun invoke(date: String,weeks: Int, days: Int): String? {
         val diffOfDaysFromUS = dateCalculator.getDaysDiff(date)
         val totalDiffOfDays = days + (diffOfDaysFromUS % com.devj.gestantescontrolcompose.common.domain.Constants.DAYS_BY_WEEKS)
         val weeks =
@@ -19,6 +19,6 @@ class CalculateByUS @Inject constructor(private val dateCalculator: DateCalculat
             else totalDiffOfDays - com.devj.gestantescontrolcompose.common.domain.Constants.DAYS_BY_WEEKS
 
         val gestationalAge = "${weeks}." + "$days"
-        return if (gestationalAge.toFloat() < 42f) gestationalAge else " Postérmino"
+        return if (gestationalAge.toFloat() < 42f) gestationalAge else null
     }
 }

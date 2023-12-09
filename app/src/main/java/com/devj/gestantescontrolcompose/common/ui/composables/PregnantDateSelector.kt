@@ -24,10 +24,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.devj.gestantescontrolcompose.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -186,8 +188,6 @@ fun Calendar(
     onClose: () -> Unit,
 ) {
     val pickerState = rememberDatePickerState()
-//    DatePickerDialog
-    //DatePicker
 
     DatePickerDialog(
         modifier = Modifier.padding(16.dp),
@@ -198,16 +198,15 @@ fun Calendar(
             ElevatedButton(onClick = {
                 val millis = pickerState.selectedDateMillis
                 val date = millis?.let {
-                    val formater = DateTimeFormatter.ISO_DATE
+                    val formatter = DateTimeFormatter.ISO_DATE
                     val localDate = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC")).toLocalDate()
-                    localDate.format(formater)
+                    localDate.format(formatter)
                 }
                 onDateSelected(date)
                 onClose()
             }) {
-                Text("Confirmar")
+                Text(stringResource(R.string.confirm))
             }
-
 
         }) {
         DatePicker(

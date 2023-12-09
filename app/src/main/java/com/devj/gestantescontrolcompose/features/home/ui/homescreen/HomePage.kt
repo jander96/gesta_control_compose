@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,9 +52,8 @@ import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.SpacerBy
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
-import com.devj.gestantescontrolcompose.common.ui.theme.deepPurple
-import com.devj.gestantescontrolcompose.common.ui.theme.hardPink
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
+import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 import com.devj.gestantescontrolcompose.features.home.domain.model.Stats
 import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialog
 import com.devj.gestantescontrolcompose.features.home.ui.composables.RecyclerItem
@@ -86,6 +87,11 @@ fun HomePage(
     LaunchedEffect(key1 = homeViewModel.viewState) {
         homeViewModel.intentFlow.emit(HomeIntent.EnterAtHome)
     }
+
+    LaunchedEffect(key1 = viewState.activeFilter) {
+        scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnFilterClick(viewState.activeFilter)) }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         if(showDeleteDialog){
             DeleteDialog(
@@ -119,11 +125,12 @@ fun HomePage(
                     },
                 ),
                 onFilterClick = {filterItem->
-
+                    scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnFilterClick(filterItem)) }
                 },
                 onSearch = {query->
                     scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnSearch(query)) }
-                }
+                },
+                filterType = viewState.activeFilter
             )
         }
         Surface(
@@ -158,7 +165,6 @@ fun HomePage(
             }
         }
 
-
         AnimatedVisibility(
             scrollState.isScrollInProgress.not() ,
             enter = slideInVertically(
@@ -177,8 +183,6 @@ fun HomePage(
         }
 
     }
-
-
 }
 
 @Composable
@@ -198,8 +202,9 @@ fun FAB(onClick: () -> Unit, modifier: Modifier = Modifier) {
 fun HomeHeader(
     modifier: Modifier = Modifier,
     stats: Stats = Stats(),
-    onFilterClick: (String)->Unit,
+    onFilterClick: (FilterType?)->Unit,
     onSearch: (String)->Unit,
+    filterType: FilterType? = null
 ) {
     val withScreen = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
@@ -207,7 +212,9 @@ fun HomeHeader(
         mutableStateOf(false)
     }
 
-    val dropDownItems = listOf("A término", "Alto riesgo",)
+   var selected by rememberSaveable {
+       mutableStateOf(false)
+   }
 
     Column(
         modifier = modifier
@@ -224,7 +231,7 @@ fun HomeHeader(
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "search bar",
+                            contentDescription = stringResource(R.string.search_bar),
                         )
                     },
                     modifier = modifier
@@ -248,7 +255,7 @@ fun HomeHeader(
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_filter_svg),
-                            contentDescription = "filter",
+                            contentDescription = stringResource(R.string.filter),
                             modifier = Modifier
                                 .size(24.dp)
                         )
@@ -261,18 +268,34 @@ fun HomeHeader(
                         modifier = Modifier.align(Alignment.BottomCenter)
 
                         ) {
-                        dropDownItems.forEach { item ->
+
                             DropdownMenuItem(text = {
-                                Text(
-                                    text = item,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.height(14.dp)
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                    Text(
+                                        text = stringResource(R.string.higth_risk),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.height(14.dp)
+                                    )
+                                    if(filterType == FilterType.onRisk)
+                                        Icon(
+                                            modifier = Modifier.size(12.dp),
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = "on risk filter" )
+
+
+                                }
                             }, onClick = {
-                                onFilterClick(item)
+                                selected = !selected
+                                if(selected){
+                                    onFilterClick(FilterType.onRisk)
+                                }else{
+                                    onFilterClick(null)
+                                }
+
                                 isContextMenuVisible = false
                             })
-                        }
+
 
                     }
                 }
@@ -285,7 +308,7 @@ fun HomeHeader(
 
 
         Text(
-            "Estadisticas",
+            stringResource(R.string.stats),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = modifier.padding(bottom = 12.dp, top = 8.dp)
@@ -293,12 +316,12 @@ fun HomeHeader(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 32.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            StatCard(value = stats.total, label = "Total", cardColor = deepPurple, size = 68.dp)
-            StatCard(value = stats.onRisk, label = "De riesgo", cardColor = hardPink, elevation = 6.dp)
-            StatCard(value = stats.onFinalPeriod, label = "A término", cardColor = deepPurple, size = 68.dp)
+            StatCard(value = stats.total, label = stringResource(R.string.total), cardColor = MaterialTheme.colorScheme.secondaryContainer)
+            StatCard(value = stats.onRisk, label = stringResource(R.string.on_risk), cardColor = MaterialTheme.colorScheme.secondaryContainer)
+            StatCard(value = stats.onFinalPeriod, label = stringResource(R.string.on_last_period), cardColor = MaterialTheme.colorScheme.secondaryContainer)
 
         }
         Spacer(modifier = Modifier.height(16.dp))

@@ -2,6 +2,7 @@ package com.devj.gestantescontrolcompose.features.home.ui.composables
 
 
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,13 +22,17 @@ import androidx.compose.ui.unit.dp
 fun StatCard(
     modifier: Modifier = Modifier,
     cardColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
-    size: Dp = 72.dp,
+    size: Dp = 64.dp,
     value: Int,
     label: String,
     elevation : Dp = 2.dp
 ){
 
-    val animatedValue = animateIntAsState(targetValue = value, label = "value_animation")
+    val animatedValue = animateIntAsState(
+        targetValue = value,
+        label = "value_animation",
+        animationSpec = tween(200)
+    )
     Surface(
         modifier = modifier.size(size),
         color = cardColor,

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,22 +49,34 @@ fun CircularIndicator(
         ),
     foregroundIndicatorStrokeWidth: Float = canvasSize.value * 0.2f,
     indicatorStrokeCap: StrokeCap = StrokeCap.Round,
-    bigTextFontSize: TextUnit = TextUnit(value = canvasSize.value * 0.25f, type = TextUnitType.Sp),
+    bigTextFontSize: TextUnit = TextUnit(value = canvasSize.value * 0.20f, type = TextUnitType.Sp),
     bigTextColor: Color = MaterialTheme.colorScheme.onSurface,
     bigTextSuffix: String = "",
     smallText: String = "",
     smallTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-    smallTextFontSize: TextUnit =  TextUnit(value = canvasSize.value * 0.20f, type = TextUnitType.Sp),
+    smallTextFontSize: TextUnit =  TextUnit(value = canvasSize.value * 0.16f, type = TextUnitType.Sp),
+    bigTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    smallTextStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    hasTop: Boolean = false
 ) {
+
+
     var allowedIndicatorValue by remember { mutableFloatStateOf(maxIndicatorValue)}
 
-    allowedIndicatorValue =
-        if (indicatorValue <= maxIndicatorValue) indicatorValue else maxIndicatorValue
+    allowedIndicatorValue = if (hasTop) {
+        if (indicatorValue <= maxIndicatorValue) indicatorValue
+        else maxIndicatorValue
+    } else {
+        indicatorValue
+    }
 
     var animatedIndicatorValue by remember{ mutableFloatStateOf(0f) }
 
     LaunchedEffect(allowedIndicatorValue){
-        animatedIndicatorValue = allowedIndicatorValue.toFloat()
+        animatedIndicatorValue =
+            if (allowedIndicatorValue < maxIndicatorValue)
+                allowedIndicatorValue
+            else maxIndicatorValue
     }
 
     val percentage = (animatedIndicatorValue / maxIndicatorValue) * 100
@@ -129,7 +142,9 @@ fun CircularIndicator(
             bigTextSuffix = bigTextSuffix,
             smallText = smallText,
             smallTextColor = smallTextColor,
-            smallTextFontSize = smallTextFontSize
+            smallTextFontSize = smallTextFontSize,
+            bigTextStyle  = bigTextStyle,
+            smallTextStyle = smallTextStyle,
         )
 
     }
@@ -190,11 +205,14 @@ fun EmbeddedElements(
     bigTextSuffix: String,
     smallText: String,
     smallTextColor: Color,
-    smallTextFontSize: TextUnit
+    smallTextFontSize: TextUnit,
+    bigTextStyle: TextStyle,
+    smallTextStyle: TextStyle,
 ){
 
     Text(
         text = smallText,
+        style = smallTextStyle,
         color = smallTextColor,
         fontSize = smallTextFontSize,
         textAlign = TextAlign.Center
@@ -202,7 +220,7 @@ fun EmbeddedElements(
     Text(
         text = if (bigTextSuffix.isNotEmpty())"$bigText $bigTextSuffix" else "$bigText",
         color = bigTextColor,
-        fontSize = bigTextFontSize,
+        style = bigTextStyle.copy(fontSize = bigTextFontSize),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold
     )
