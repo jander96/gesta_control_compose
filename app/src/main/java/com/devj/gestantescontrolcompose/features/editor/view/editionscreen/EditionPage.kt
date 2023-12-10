@@ -39,7 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,7 +65,6 @@ import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +78,6 @@ fun EditionPage(
     val state = editionViewModel.viewState.collectAsStateWithLifecycle()
     var pregnant: PregnantUI? by remember { mutableStateOf(null) }
     pregnant = state.value.pregnant
-    val scope = rememberCoroutineScope()
     var image: Bitmap? by rememberSaveable { mutableStateOf(null) }
     val contactManager = ContactManager(context)
     val formState = FormState(pregnant)
@@ -108,7 +105,7 @@ fun EditionPage(
 
     LaunchedEffect(pregnantId) {
         if (pregnantId != null && pregnantId != 0) {
-            editionViewModel.intentFlow.emit(EditionIntent.LoadPregnant(pregnantId))
+            editionViewModel.sendUiEvent(EditionIntent.LoadPregnant(pregnantId))
         }
     }
 
@@ -175,13 +172,12 @@ fun EditionPage(
                 onClick = {
                     formState.validateAllRequiredFields()
                     if (formState.isValid()) {
-                        scope.launch {
-                            editionViewModel.intentFlow.emit(
-                                EditionIntent.SaveDataPregnant(
-                                    formState.buildPregnant()
-                                )
+                        editionViewModel.sendUiEvent(
+                            EditionIntent.SaveDataPregnant(
+                                formState.buildPregnant()
                             )
-                        }
+                        )
+
                     } else {
                         Toast.makeText(context, "Formulario inválido", Toast.LENGTH_LONG).show()
                     }

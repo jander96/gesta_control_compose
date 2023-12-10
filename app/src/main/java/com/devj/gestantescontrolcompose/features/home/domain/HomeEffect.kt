@@ -3,12 +3,13 @@ package com.devj.gestantescontrolcompose.features.home.domain
 
 
 
+import com.devj.gestantescontrolcompose.common.basemvi.MviResult
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 import kotlinx.coroutines.flow.Flow
 
 
-sealed class HomeEffect {
+sealed class HomeEffect : MviResult {
     sealed class PregnantListUpdate : HomeEffect() {
         object Loading : HomeEffect()
         object EmptyResponse : HomeEffect()

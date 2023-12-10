@@ -36,7 +36,7 @@ class CalculatorViewModel @Inject constructor(
         }
 
 
-    override fun process(action: CalculatorActions): CalculatorEffect {
+    override suspend fun process(action: CalculatorActions): CalculatorEffect {
         return when (action) {
             CalculatorActions.CalculateGestationalAge -> calculateGE()
             CalculatorActions.ChangeCalculatorType -> CalculatorEffect.CalculatorTypeChanged

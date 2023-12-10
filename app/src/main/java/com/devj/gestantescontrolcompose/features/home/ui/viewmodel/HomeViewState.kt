@@ -1,5 +1,6 @@
 package com.devj.gestantescontrolcompose.features.home.ui.viewmodel
 
+import com.devj.gestantescontrolcompose.common.basemvi.MviViewState
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,4 @@ data class HomeViewState(
     val error : Throwable? = null,
     val activeFilter: FilterType? = null,
 
-)
+): MviViewState

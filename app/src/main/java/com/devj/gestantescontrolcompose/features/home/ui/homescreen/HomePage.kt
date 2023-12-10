@@ -59,7 +59,6 @@ import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialo
 import com.devj.gestantescontrolcompose.features.home.ui.composables.RecyclerItem
 import com.devj.gestantescontrolcompose.features.home.ui.composables.StatCard
 import com.devj.gestantescontrolcompose.features.home.ui.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 
 
 @ExperimentalMaterial3Api
@@ -85,11 +84,11 @@ fun HomePage(
     
 
     LaunchedEffect(key1 = homeViewModel.viewState) {
-        homeViewModel.intentFlow.emit(HomeIntent.EnterAtHome)
+        homeViewModel.sendUiEvent(HomeIntent.EnterAtHome)
     }
 
     LaunchedEffect(key1 = viewState.activeFilter) {
-        scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnFilterClick(viewState.activeFilter)) }
+        homeViewModel.sendUiEvent(HomeIntent.OnFilterClick(viewState.activeFilter))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -98,7 +97,7 @@ fun HomePage(
                 onAccept = {
                     showDeleteDialog = false
                     pregnantId?.let {
-                        scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnDeletePressed(it)) }
+                        homeViewModel.sendUiEvent(HomeIntent.OnDeletePressed(it))
                     }
                 }, onDismiss = { showDeleteDialog = false }
             )
@@ -125,10 +124,10 @@ fun HomePage(
                     },
                 ),
                 onFilterClick = {filterItem->
-                    scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnFilterClick(filterItem)) }
+                    homeViewModel.sendUiEvent(HomeIntent.OnFilterClick(filterItem))
                 },
                 onSearch = {query->
-                    scope.launch { homeViewModel.intentFlow.emit(HomeIntent.OnSearch(query)) }
+                    homeViewModel.sendUiEvent(HomeIntent.OnSearch(query))
                 },
                 filterType = viewState.activeFilter
             )

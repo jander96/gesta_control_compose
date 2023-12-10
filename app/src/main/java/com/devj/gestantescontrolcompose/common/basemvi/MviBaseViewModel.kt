@@ -30,23 +30,14 @@ interface MviViewState
  */
 abstract class MviBaseViewModel<I : MviIntent, A : MviAction, R : MviResult, S : MviViewState>() :
     ViewModel() {
+    private val uiEvent = MutableSharedFlow<I>()
     /** You must initialize the UI State Model */
     protected abstract val mutableViewState: MutableStateFlow<S>
     val viewState: StateFlow<S> get() = mutableViewState
 
-    private val uiEvent = MutableSharedFlow<I>()
-
     init {
         viewModelScope.launch {
             onEvent(uiEvent)
-        }
-    }
-
-    private suspend fun onEvent(event: Flow<I>){
-        event.map { intent ->
-            intent.mapToAction()
-        }.collect{
-            updateState(it as A)
         }
     }
     /** @param intent send en new ui event to viewModel  */
@@ -55,18 +46,27 @@ abstract class MviBaseViewModel<I : MviIntent, A : MviAction, R : MviResult, S :
             uiEvent.emit(intent)
         }
     }
-    /** Transform incoming actions into model results  */
-    protected abstract fun process(action: A): R
 
-    /** Update de new uiState based in the model results */
-    protected abstract fun reduce(oldState: S, result: R): S
+    @Suppress("UNCHECKED_CAST")/*]]     nbz;                    */
+    private suspend fun onEvent(event: Flow<I>){
+        event
+            .map { it.mapToAction() as A }
+            .collect(::updateState)
+    }
 
-
-    private fun updateState(action: A) {
+    private suspend fun updateState(action: A) {
         val result = process(action)
         mutableViewState.update { state ->
             reduce(state, result)
         }
     }
+
+    /** Map incoming actions into model results  */
+    protected abstract suspend fun process(action: A): R
+
+    /** Update de new uiState based in the model results */
+    protected abstract fun reduce(oldState: S, result: R): S
+
+
 
 }
