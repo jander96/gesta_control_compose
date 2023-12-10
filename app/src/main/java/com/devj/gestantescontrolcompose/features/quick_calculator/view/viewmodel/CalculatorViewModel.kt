@@ -1,7 +1,6 @@
 package com.devj.gestantescontrolcompose.features.quick_calculator.view.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
 import com.devj.gestantescontrolcompose.common.domain.model.USData
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByFUM
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByUS
@@ -9,14 +8,8 @@ import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateFPP
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorActions
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorEffect
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorIntent
-import com.devj.gestantescontrolcompose.features.quick_calculator.domain.mapToAction
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -25,27 +18,11 @@ class CalculatorViewModel @Inject constructor(
     private val calculateByFUM: CalculateByFUM,
     private val calculateByUS: CalculateByUS,
     private val calculateFPP: CalculateFPP
-) : ViewModel() {
+) : MviBaseViewModel<CalculatorIntent,CalculatorActions,CalculatorEffect,CalculatorViewState>() {
 
-    val intentFlow = MutableSharedFlow<CalculatorIntent>()
 
-    private val _mutableViewState =  MutableStateFlow(CalculatorViewState())
+    override val mutableViewState =  MutableStateFlow(CalculatorViewState())
 
-    val viewState: StateFlow<CalculatorViewState> get() = _mutableViewState
-
-    init {
-        viewModelScope.launch {
-            intentFlow.map { intent->
-                intent.mapToAction() }
-                .map {action-> processor(action) }
-                .collect { effect ->
-                    _mutableViewState.update { state->
-                        reduceState(state, effect)
-                    }
-                }
-        }
-
-    }
     private fun isValidForUSG(state: CalculatorViewState ): Boolean  {
             if(state.usDate.isBlank())return  false
             if (state.weeks.isBlank() || state.days.isBlank())  return false
@@ -59,7 +36,7 @@ class CalculatorViewModel @Inject constructor(
         }
 
 
-    private fun processor(action: CalculatorActions): CalculatorEffect {
+    override fun process(action: CalculatorActions): CalculatorEffect {
         return when (action) {
             CalculatorActions.CalculateGestationalAge -> calculateGE()
             CalculatorActions.ChangeCalculatorType -> CalculatorEffect.CalculatorTypeChanged
@@ -98,11 +75,11 @@ class CalculatorViewModel @Inject constructor(
 
     }
 
-    private fun reduceState(
+    override fun reduce(
         oldState: CalculatorViewState,
-        effect: CalculatorEffect
+        result: CalculatorEffect
     ): CalculatorViewState {
-        return when (effect) {
+        return when (result) {
             CalculatorEffect.CalculatorTypeChanged -> {
                 oldState.copy(
                     isUsActive = !oldState.isUsActive,
@@ -113,42 +90,42 @@ class CalculatorViewModel @Inject constructor(
 
             is CalculatorEffect.DaysChanged -> {
                 oldState.copy(
-                    days = effect.days,
-                    isValidForFUM = isValidForFUM(oldState.copy(days = effect.days)),
-                    isValidForUSG = isValidForUSG(oldState.copy(days = effect.days)),
+                    days = result.days,
+                    isValidForFUM = isValidForFUM(oldState.copy(days = result.days)),
+                    isValidForUSG = isValidForUSG(oldState.copy(days = result.days)),
                 )
             }
 
             is CalculatorEffect.FUMDateChanged -> {
                 oldState.copy(
-                    fumDate = effect.date,
-                    isValidForFUM = isValidForFUM(oldState.copy(fumDate = effect.date,)),
-                    isValidForUSG = isValidForUSG(oldState.copy(fumDate = effect.date,))
+                    fumDate = result.date,
+                    isValidForFUM = isValidForFUM(oldState.copy(fumDate = result.date,)),
+                    isValidForUSG = isValidForUSG(oldState.copy(fumDate = result.date,))
                 )
             }
 
             is CalculatorEffect.GestationalAgeCalculated -> {
                 oldState.copy(
-                    fpp = effect.fpp,
-                    gestationalAge = effect.gestationalAge,
-                    isValidForFUM = isValidForFUM(oldState.copy(gestationalAge = effect.gestationalAge,)),
-                    isValidForUSG = isValidForUSG(oldState.copy(gestationalAge = effect.gestationalAge,))
+                    fpp = result.fpp,
+                    gestationalAge = result.gestationalAge,
+                    isValidForFUM = isValidForFUM(oldState.copy(gestationalAge = result.gestationalAge,)),
+                    isValidForUSG = isValidForUSG(oldState.copy(gestationalAge = result.gestationalAge,))
                 )
             }
 
             is CalculatorEffect.USDateChanged -> {
                 oldState.copy(
-                    usDate = effect.date,
-                    isValidForFUM = isValidForFUM(oldState.copy( usDate = effect.date,)),
-                    isValidForUSG = isValidForUSG(oldState.copy(usDate = effect.date))
+                    usDate = result.date,
+                    isValidForFUM = isValidForFUM(oldState.copy( usDate = result.date,)),
+                    isValidForUSG = isValidForUSG(oldState.copy(usDate = result.date))
                 )
             }
 
             is CalculatorEffect.WeeksChanged -> {
                 oldState.copy(
-                    weeks = effect.weeks,
-                    isValidForFUM = isValidForFUM(oldState.copy(  weeks = effect.weeks,)),
-                    isValidForUSG = isValidForUSG(oldState.copy(  weeks = effect.weeks,))
+                    weeks = result.weeks,
+                    isValidForFUM = isValidForFUM(oldState.copy(  weeks = result.weeks,)),
+                    isValidForUSG = isValidForUSG(oldState.copy(  weeks = result.weeks,))
                 )
             }
         }

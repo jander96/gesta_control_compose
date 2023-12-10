@@ -11,15 +11,16 @@ sealed class CalculatorIntent : MviIntent {
     data class WeeksDateChanged(val weeks: String): CalculatorIntent()
     data class DaysDateChanged(val days: String): CalculatorIntent()
 
+ override fun mapToAction(): CalculatorActions{
+  return when(this){
+   CalculatorIntent.CalculateButtonClicked -> CalculatorActions.CalculateGestationalAge
+   is CalculatorIntent.DaysDateChanged -> CalculatorActions.UpdateDays(days)
+   is CalculatorIntent.FUMDateChanged -> CalculatorActions.UpdateFumDate(date)
+   CalculatorIntent.SwitchClicked -> CalculatorActions.ChangeCalculatorType
+   is CalculatorIntent.USDateChanged -> CalculatorActions.UpdateUsDate(date)
+   is CalculatorIntent.WeeksDateChanged -> CalculatorActions.UpdateWeeks(weeks)
+  }
+ }
+
 }
 
-fun CalculatorIntent.mapToAction(): CalculatorActions{
- return when(this){
-  CalculatorIntent.CalculateButtonClicked -> CalculatorActions.CalculateGestationalAge
-  is CalculatorIntent.DaysDateChanged -> CalculatorActions.UpdateDays(days)
-  is CalculatorIntent.FUMDateChanged -> CalculatorActions.UpdateFumDate(date)
-  CalculatorIntent.SwitchClicked -> CalculatorActions.ChangeCalculatorType
-  is CalculatorIntent.USDateChanged -> CalculatorActions.UpdateUsDate(date)
-  is CalculatorIntent.WeeksDateChanged -> CalculatorActions.UpdateWeeks(weeks)
- }
-}

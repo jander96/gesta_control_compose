@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,7 +51,6 @@ import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.exi
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.exitToStart
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.composables.CustomSwitcher
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.viewmodel.CalculatorViewModel
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -60,7 +58,6 @@ fun CalculatorPage(
     viewModel: CalculatorViewModel = hiltViewModel()
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
 
 
     Scaffold(
@@ -79,7 +76,7 @@ fun CalculatorPage(
             CalculatorSwitcher(
                 isByUs = viewState.isUsActive,
                 onSwitchClick = {
-                    scope.launch { viewModel.intentFlow.emit(CalculatorIntent.SwitchClicked) }
+                    viewModel.sendUiEvent(CalculatorIntent.SwitchClicked)
                 },
                 modifier = Modifier.constrainAs(switcher) {
                     top.linkTo(graph.bottom)
@@ -118,35 +115,25 @@ fun CalculatorPage(
                     },
                 fumDate = viewState.fumDate,
                 onCalculateFumClick = {
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.CalculateButtonClicked)
-                    }
+
+                    viewModel.sendUiEvent(CalculatorIntent.CalculateButtonClicked)
                 },
                 onFumDateSelected = { date ->
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.FUMDateChanged(date))
-                    }
+                    viewModel.sendUiEvent(CalculatorIntent.FUMDateChanged(date))
                 },
                 usDate = viewState.usDate,
                 onUsDateSelected = { date ->
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.USDateChanged(date))
-                    }
+                    viewModel.sendUiEvent(CalculatorIntent.USDateChanged(date))
                 },
                 onCalculateUsClick = {
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.CalculateButtonClicked)
-                    }
+                    viewModel.sendUiEvent(CalculatorIntent.CalculateButtonClicked)
                 },
                 onWeekSelected = { week ->
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.WeeksDateChanged(week))
-                    }
+
+                    viewModel.sendUiEvent(CalculatorIntent.WeeksDateChanged(week))
                 },
                 onDaySelected = { days ->
-                    scope.launch {
-                        viewModel.intentFlow.emit(CalculatorIntent.DaysDateChanged(days))
-                    }
+                    viewModel.sendUiEvent(CalculatorIntent.DaysDateChanged(days))
                 },
                 weeks = viewState.weeks,
                 days = viewState.days,

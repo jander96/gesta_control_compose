@@ -1,6 +1,8 @@
 package com.devj.gestantescontrolcompose.features.quick_calculator.domain
 
-sealed class CalculatorActions {
+import com.devj.gestantescontrolcompose.common.basemvi.MviAction
+
+sealed class CalculatorActions : MviAction {
     object ChangeCalculatorType: CalculatorActions()
     object CalculateGestationalAge: CalculatorActions()
 

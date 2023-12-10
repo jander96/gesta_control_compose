@@ -1,6 +1,8 @@
 package com.devj.gestantescontrolcompose.features.quick_calculator.domain
 
-sealed class CalculatorEffect {
+import com.devj.gestantescontrolcompose.common.basemvi.MviResult
+
+sealed class CalculatorEffect: MviResult {
     object CalculatorTypeChanged: CalculatorEffect()
     data class GestationalAgeCalculated(val gestationalAge: String , val fpp: String): CalculatorEffect()
     data class USDateChanged(val date: String): CalculatorEffect()
