@@ -1,91 +1,93 @@
 package com.devj.gestantescontrolcompose.features.editor.view.editionscreen
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Patterns
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.text.isDigitsOnly
+import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.DataDate
 import com.devj.gestantescontrolcompose.common.domain.model.Measures
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
+import com.devj.gestantescontrolcompose.common.extensions.compressQuality
+import com.devj.gestantescontrolcompose.common.extensions.convertToString
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 
+class FormState ( private val context: Context) {
 
-class FormState(
+    var id by mutableIntStateOf(0)
+    private var _name by  mutableStateOf("")
+    val name get() = _name
+    var nameErrorMessage by  mutableStateOf<String?>(null)
 
-) {
+    private var _lastName by  mutableStateOf("")
+    val lastName get() = _lastName
+    var lastNameErrorMessage by  mutableStateOf<String?>(null)
 
+    private var _age by  mutableStateOf("")
+    val age get()= _age
+    var ageErrorMessage  by  mutableStateOf<String?>(null)
 
+    private var _size by mutableStateOf("")
+    val size get() = _size
+    var sizeErrorMessage  by  mutableStateOf<String?>(null)
 
-    val id = mutableIntStateOf(0)
-    private val _name =  mutableStateOf("")
-    val name get() = _name.value
-    val nameErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _weight by mutableStateOf("")
+    val weight get() = _weight
+    var weightErrorMessage  by  mutableStateOf<String?>(null)
 
-    private val _lastName =  mutableStateOf("")
-    val lastName get() = _lastName.value
-    val lastNameErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _phone by  mutableStateOf("")
+    val phone get() = _phone
+    var phoneErrorMessage  by  mutableStateOf<String?>(null)
 
-    private val _age =  mutableStateOf("")
-    val age get()= _age.value
-    val ageErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _firstUS by  mutableStateOf("")
+    val firstUS get()= _firstUS
 
-    private val _size = mutableStateOf("")
-    val size get() = _size.value
-    val sizeErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _firstUsWeeks by  mutableStateOf("")
+    val firstUsWeeks get()= _firstUsWeeks
+    var weeksErrorMessage  by  mutableStateOf<String?>(null)
 
-    private val _weight = mutableStateOf("")
-    val weight get() = _weight.value
-    val weightErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _firstUSDays by  mutableStateOf("")
+    val firstUSDays get()= _firstUSDays
+    var daysErrorMessage  by  mutableStateOf<String?>(null)
 
-    private val _phone =  mutableStateOf("")
-    val phone get() = _phone.value
-    val phoneErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _fum by  mutableStateOf("")
+    val fum get()= _fum
 
-    private val _firstUS =  mutableStateOf("")
-    val firstUS get()= _firstUS.value
+    private var _photo by  mutableStateOf<String?>(null)
+    val photo get()= _photo
 
-    private val _firstUsWeeks =  mutableStateOf("")
-    val firstUsWeeks get()= _firstUsWeeks.value
-    val weeksErrorMessage: MutableState<String?> =  mutableStateOf(null)
+    private var _isFumReliable by mutableStateOf<Boolean>(false)
+    val isFumReliable get() = _isFumReliable
 
-    private val _firstUSDays =  mutableStateOf("")
-    val firstUSDays get()= _firstUSDays.value
-    val daysErrorMessage: MutableState<String?> =  mutableStateOf(null)
-
-    private val _fum =  mutableStateOf("")
-    val fum get()= _fum.value
-
-    private val _photo =  mutableStateOf("")
-    val photo get()= _photo.value
-
-    private val _isFumReliable: MutableState<Boolean> = mutableStateOf(false)
-    val isFumReliable get() = _isFumReliable.value
-
-    private var _riskClassification = mutableStateOf(RiskClassification.LOW_RISK)
+    private var _riskClassification by mutableStateOf(RiskClassification.LOW_RISK)
     val riskClassification get() = _riskClassification
 
+    private var _isLoading by mutableStateOf(false)
+    val isLoading get() = _isLoading
 
 
 
-
-    constructor(pregnantUI: PregnantUI?): this() {
+    constructor(context: Context,pregnantUI: PregnantUI?): this(context) {
         pregnantUI?.let { pregnant->
-            id.intValue = pregnant.id
-            _name.value = pregnant.name
-            _lastName.value = pregnant.lastName
-            _age.value = pregnant.age
-            _size.value = pregnant.size
-            _weight.value = pregnant.weight
-            _phone.value = pregnant.phoneNumber
-            _firstUS.value = pregnant.firstUS
-            _fum.value = pregnant.fum
-            _isFumReliable.value = pregnant.isFUMReliable
-            _photo.value = pregnant.photo
-            _riskClassification.value = pregnant.riskClassification
-           _firstUsWeeks.value =  pregnant.firstUSWeeks
-           _firstUSDays.value =  pregnant.firstUSDays
+            id = pregnant.id
+            _name = pregnant.name
+            _lastName = pregnant.lastName
+            _age = pregnant.age
+            _size = pregnant.size
+            _weight = pregnant.weight
+            _phone = pregnant.phoneNumber
+            _firstUS = pregnant.firstUS
+            _fum = pregnant.fum
+            _isFumReliable = pregnant.isFUMReliable
+            _photo = pregnant.photo
+            _riskClassification = pregnant.riskClassification
+           _firstUsWeeks =  pregnant.firstUSWeeks
+           _firstUSDays =  pregnant.firstUSDays
 
         }
     }
@@ -94,7 +96,7 @@ class FormState(
 
     fun buildPregnant(): Pregnant {
        return  Pregnant(
-            id = id.intValue,
+            id = id,
             name = name,
             lastName = lastName,
             age = age.toInt(),
@@ -108,21 +110,21 @@ class FormState(
                 firstUSDays = if(firstUSDays.isNotEmpty()) firstUSDays.toInt() else null
             ),
             photo = photo,
-           riskClassification = _riskClassification.value
+           riskClassification = _riskClassification
 
         )
     }
 
     fun isValid(): Boolean {
         val errors = listOf(
-            nameErrorMessage.value,
-            lastNameErrorMessage.value,
-            ageErrorMessage.value,
-            sizeErrorMessage.value,
-            weightErrorMessage.value,
-            phoneErrorMessage.value,
-            weeksErrorMessage.value,
-            daysErrorMessage.value
+            nameErrorMessage,
+            lastNameErrorMessage,
+            ageErrorMessage,
+            sizeErrorMessage,
+            weightErrorMessage,
+            phoneErrorMessage,
+            weeksErrorMessage,
+            daysErrorMessage,
         )
 
         val requiredFields = listOf(
@@ -162,106 +164,120 @@ class FormState(
         }
     }
 
+    private fun toggleLoadingState(){
+        _isLoading = !_isLoading
+    }
+
+    suspend fun savePhoto(bitmap: Bitmap){
+
+            toggleLoadingState()
+            bitmap.compressQuality(3).also { compressedBitmap ->
+                changePhoto(compressedBitmap.convertToString())
+                toggleLoadingState()
+            }
+
+    }
+
     private fun validateName(name: String):String?{
-        if(name.isBlank()) return "requerido"
+        if(name.isBlank()) return context.getString(R.string.required)
         return null
     }
 
     private fun validateLastname(lastname: String): String?{
-        if(lastname.isBlank()) return "requerido"
+        if(lastname.isBlank()) return context.getString(R.string.required)
         return null
     }
 
     private fun validateAge(age: String): String?{
         if(age.isBlank()) return null
-        if(!age.isDigitsOnly()) return "inválido"
+        if(!age.isDigitsOnly()) return context.getString(R.string.invalid)
         val ageDigit = age.toInt()
-        if(ageDigit !in 5..60) return "edad infértil"
+        if(ageDigit !in 5..60) return  context.getString(R.string.invalid)
         return null
     }
 
     private fun validateWeight(weight: String): String?{
         val regex = "^[0-9]+(\\.[0-9]+)?|[0-9]+\$".toRegex()
-        if(weight.isBlank()) return "requerido"
-        if(!regex.matches(weight)) return "inválido"
+        if(weight.isBlank()) return context.getString(R.string.required)
+        if(!regex.matches(weight)) return  context.getString(R.string.invalid)
         return null
     }
 
     private fun validateFirstUsWeeks(weeks: String): String?{
-        if(weeks.isBlank()) return "requerido"
-        if(!weeks.isDigitsOnly()) return "inválido"
-        if(weeks.toInt() !in 0..42) return "rango inválido"
+        if(weeks.isBlank()) return context.getString(R.string.required)
+        if(!weeks.isDigitsOnly()) return context.getString(R.string.invalid)
+        if(weeks.toInt() !in 0..42) return context.getString(R.string.invalid)
         return null
     }
 
     private fun validateFirstUsDays(days: String): String?{
-        if(days.isBlank()) return "requerido"
-        if(!days.isDigitsOnly()) return "solo números"
-        if(days.toInt() !in 0..6) return "inválido"
+        if(days.isBlank()) return context.getString(R.string.required)
+        if(!days.isDigitsOnly()) return context.getString(R.string.only_numbers)
+        if(days.toInt() !in 0..6) return context.getString(R.string.invalid)
         return null
     }
 
     private fun validatePhone(phone: String): String?{
         val pattern = Patterns.PHONE
         val matcher = pattern.matcher(phone)
-        if(!matcher.matches()) return "inválido"
+        if(!matcher.matches()) return context.getString(R.string.invalid)
         return null
     }
 
     private fun validateSize(size: String): String?{
         val regex = "^[0-9]+(\\.[0-9]+)?|[0-9]+\$".toRegex()
-        if(size.isBlank()) return "requerido"
-        if(!regex.matches(size)) return "inválido"
+        if(size.isBlank()) return context.getString(R.string.required)
+        if(!regex.matches(size)) return context.getString(R.string.invalid)
         return null
     }
     fun changePhone(phone: String) {
-        this._phone.value = phone
-        this.phoneErrorMessage.value = validatePhone(phone)
+        this._phone = phone
+        this.phoneErrorMessage = validatePhone(phone)
     }
     fun changeName(name : String){
-        this._name.value = name
-        this.nameErrorMessage.value = validateName(name)
+        this._name = name
+        this.nameErrorMessage = validateName(name)
     }
     fun changeLastname (lastname: String){
-        this._lastName.value = lastname
-        this.lastNameErrorMessage.value = validateLastname(lastname)
+        this._lastName = lastname
+        this.lastNameErrorMessage = validateLastname(lastname)
     }
     fun changeAge(age : String){
-        this._age.value = age
-        this.ageErrorMessage.value = validateAge(age)
+        this._age = age
+        this.ageErrorMessage = validateAge(age)
     }
     fun changeSize(size : String){
-        this._size.value = size
-        this.sizeErrorMessage.value = validateSize(size)
+        this._size = size
+        this.sizeErrorMessage = validateSize(size)
     }
     fun changeWeight(weight: String){
-        this._weight.value = weight
-        this.weightErrorMessage.value = validateWeight(weight)
+        this._weight = weight
+        this.weightErrorMessage = validateWeight(weight)
     }
     fun changeUsDate(us : String){
-        _firstUS.value = us
+        _firstUS = us
     }
     fun changeUsWeeks(weeks : String){
-        _firstUsWeeks.value = weeks
-        weeksErrorMessage.value = validateFirstUsWeeks(weeks)
+        _firstUsWeeks = weeks
+        weeksErrorMessage = validateFirstUsWeeks(weeks)
     }
     fun changeUsDays(days : String){
-        _firstUSDays.value = days
-        daysErrorMessage.value = validateFirstUsDays(days)
+        _firstUSDays = days
+        daysErrorMessage = validateFirstUsDays(days)
     }
     fun changeFumDate(fum : String){
-        this._fum.value = fum
+        this._fum = fum
     }
 
     fun onCheckboxChange(isChecked: Boolean){
-        _isFumReliable.value = isChecked
+        _isFumReliable = isChecked
     }
 
     fun changePhoto(photo: String){
-        _photo.value = photo
+        _photo = photo
     }
 
     fun changeRiskClassification(classification: RiskClassification){
-        _riskClassification.value = classification
+        _riskClassification = classification
     }
 }

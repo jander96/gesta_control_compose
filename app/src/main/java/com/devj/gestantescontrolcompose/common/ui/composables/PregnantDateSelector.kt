@@ -1,5 +1,6 @@
 package com.devj.gestantescontrolcompose.common.ui.composables
 
+import android.icu.util.Calendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -52,25 +54,13 @@ fun PregnantDateSelector(
     onCheckboxChange: (Boolean)->Unit,
 
 ){
-    var showFumCalendar by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var showFumCalendar by rememberSaveable { mutableStateOf(false) }
 
-    var showUsCalendar by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var showUsCalendar by rememberSaveable { mutableStateOf(false) }
 
-    var showFumQuestion by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-
-
-
-
+    var showFumQuestion by rememberSaveable { mutableStateOf(false) }
 
     Column {
-
         if (showFumCalendar) Calendar(
             onDateSelected = {
                 it?.let {
@@ -85,7 +75,6 @@ fun PregnantDateSelector(
             onClose = { showUsCalendar = false })
 
 
-
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
 
             Column(modifier = modifier.weight(1f)) {
@@ -98,9 +87,10 @@ fun PregnantDateSelector(
                         .clickable { showUsCalendar = true },
                     onValueChange = { },
                     placeholder = {
-                        Text("U/S", style = fieldTextStyle)
+                        Text(stringResource(id = R.string.usg), style = fieldTextStyle)
                     },
                     )
+
                 AnimatedVisibility(usDate.isNotEmpty()) {
                     Row {
                         OutlinedTextField(
@@ -111,9 +101,12 @@ fun PregnantDateSelector(
                                 .padding(4.dp),
                             onValueChange = { onWeekChange(it) },
                             label = {
-                                Text("sem",style = fieldTextStyle)
+                                Text(stringResource(R.string.weeks),style = fieldTextStyle)
                             },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
                             isError = weekErrorMessage != null,
                             supportingText = {
                                 if (weekErrorMessage != null) Text(
@@ -131,9 +124,12 @@ fun PregnantDateSelector(
                                 .padding(4.dp),
                             onValueChange = { onDaysChange(it) },
                             label = {
-                                Text("dias",style = fieldTextStyle)
+                                Text(stringResource(R.string.days),style = fieldTextStyle)
                             },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
                             isError = daysErrorMessage != null,
                             supportingText = {
                                 if (daysErrorMessage != null) Text(
@@ -169,7 +165,7 @@ fun PregnantDateSelector(
                             checked = isFumReliable,
                             onCheckedChange = { onCheckboxChange(it) })
                         Text(
-                            "¿Es confiable?",
+                            stringResource(R.string.isRealible),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -210,8 +206,11 @@ fun Calendar(
 
         }) {
         DatePicker(
-            dateFormatter = DatePickerFormatter(selectedDateSkeleton = "dd/MM/yyyy"),
-            state = pickerState
+            dateFormatter = DatePickerFormatter(selectedDateSkeleton = "yyyy-MM-dd"),
+            state = pickerState,
+            dateValidator = {milliseconds ->
+                milliseconds < Calendar.getInstance().timeInMillis
+            }
         )
     }
 

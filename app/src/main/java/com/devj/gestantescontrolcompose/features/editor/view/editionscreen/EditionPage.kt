@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -36,16 +38,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,6 +59,7 @@ import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
 import com.devj.gestantescontrolcompose.common.extensions.convertToString
+import com.devj.gestantescontrolcompose.common.extensions.getBitmap
 import com.devj.gestantescontrolcompose.common.service.ContactManager
 import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.composables.ExpandableSection
@@ -65,6 +70,7 @@ import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,31 +81,35 @@ fun EditionPage(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val state = editionViewModel.viewState.collectAsStateWithLifecycle()
+    val state by editionViewModel.viewState.collectAsStateWithLifecycle()
     var pregnant: PregnantUI? by remember { mutableStateOf(null) }
-    pregnant = state.value.pregnant
-    var image: Bitmap? by rememberSaveable { mutableStateOf(null) }
+    pregnant = state.pregnant
     val contactManager = ContactManager(context)
-    val formState = FormState(pregnant)
+    val formState = FormState(context,pregnant)
+    val scope  = rememberCoroutineScope()
+    var photo : Bitmap? by remember{  mutableStateOf(null) }
 
+    SideEffect {
+        photo = formState.photo?.convertToBitmap()
+    }
 
     val camLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-            image = it
             it?.let {
+                photo = it
                 formState.changePhoto(it.convertToString())
             }
         }
+
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-
-            if (it != null) {
-
-
-            } else {
-
+            it?.let { uri ->
+              photo =  context.getBitmap(uri).also { bitmap ->
+                    scope.launch {
+                         formState.savePhoto(bitmap)
+                    }
+                }
             }
-
         }
 
 
@@ -109,11 +119,11 @@ fun EditionPage(
         }
     }
 
-    LaunchedEffect(key1 = state.value.isThereNewPregnant) {
-        if (state.value.isThereNewPregnant) onSaveTap()
+    LaunchedEffect(key1 = state.isThereNewPregnant) {
+        if (state.isThereNewPregnant) onSaveTap()
     }
 
-    val error = state.value.error?.getContentIfNotHandled()
+    val error = state.error?.getContentIfNotHandled()
     error?.let {
         Toast.makeText(LocalContext.current, it.message, Toast.LENGTH_LONG).show()
     }
@@ -139,7 +149,7 @@ fun EditionPage(
 
                 HeaderEditor(
                     modifier = Modifier.padding(16.dp),
-                    image = if (state.value.pregnant?.photo?.isNotEmpty() == true) state.value.pregnant?.photo?.convertToBitmap() else image,
+                    image = photo,
                     onCameraClick = {
                         camLauncher.launch()
                     },
@@ -150,6 +160,7 @@ fun EditionPage(
                             )
                         )
                     },
+                    isLoading = formState.isLoading,
                 )
 
                 FormularyEditor(
@@ -199,14 +210,26 @@ fun HeaderEditor(
     modifier: Modifier = Modifier,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
+    isLoading: Boolean,
 ) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-        Box() {
-            AvatarImage(image = image, placeholder = R.drawable.profile)
+        Box {
+            AnimatedContent(
+                targetState = image,
+                label = "image_change_animation",
+            ) {
+                AvatarImage(image = it, placeholder = R.drawable.woman_avatar)
+            }
+
             ImageSelectorRow(
                 onGalleryClick = onGalleryClick,
                 onCameraClick = onCameraClick,
                 modifier = Modifier.align(Alignment.BottomCenter)
+            )
+
+            if(isLoading) CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                strokeWidth = 3.dp
             )
         }
     }
@@ -217,7 +240,7 @@ fun HeaderEditor(
 @Composable
 fun FormularyEditor(
     modifier: Modifier = Modifier,
-    formState: FormState = FormState(),
+    formState: FormState,
     contactManager: ContactManager,
 ) {
 
@@ -266,14 +289,15 @@ fun FormularyEditor(
                             label = {
                                 Text(stringResource(R.string.name), style = MaterialTheme.typography.labelMedium)
                             },
-                            isError = formState.nameErrorMessage.value != null,
+                            isError = formState.nameErrorMessage != null,
                             supportingText = {
-                                if (formState.nameErrorMessage.value != null) Text(
-                                    formState.nameErrorMessage.value!!,
+                                if (formState.nameErrorMessage != null) Text(
+                                    formState.nameErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
-                            }
+                            },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
 
                         )
                         OutlinedTextField(
@@ -286,14 +310,15 @@ fun FormularyEditor(
                             label = {
                                 Text(stringResource(R.string.lastname), style = MaterialTheme.typography.labelMedium)
                             },
-                            isError = formState.lastNameErrorMessage.value != null,
+                            isError = formState.lastNameErrorMessage != null,
                             supportingText = {
-                                if (formState.lastNameErrorMessage.value != null) Text(
-                                    formState.lastNameErrorMessage.value!!,
+                                if (formState.lastNameErrorMessage != null) Text(
+                                    formState.lastNameErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
-                            }
+                            },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                         )
                     }
 
@@ -308,15 +333,19 @@ fun FormularyEditor(
                             label = {
                                 Text(stringResource(R.string.age), style = MaterialTheme.typography.labelMedium)
                             },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = formState.ageErrorMessage.value != null,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            isError = formState.ageErrorMessage != null,
                             supportingText = {
-                                if (formState.ageErrorMessage.value != null) Text(
-                                    formState.ageErrorMessage.value!!,
+                                if (formState.ageErrorMessage != null) Text(
+                                    formState.ageErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
-                            }
+                            },
+
                         )
                         OutlinedTextField(
                             textStyle = MaterialTheme.typography.labelMedium,
@@ -329,11 +358,14 @@ fun FormularyEditor(
                                 Text(stringResource(R.string.size), style = MaterialTheme.typography.labelMedium)
                             },
                             suffix = { Text(stringResource(R.string.cm)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            isError = formState.sizeErrorMessage.value != null,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Decimal,
+                                imeAction = ImeAction.Next
+                            ),
+                            isError = formState.sizeErrorMessage != null,
                             supportingText = {
-                                if (formState.sizeErrorMessage.value != null) Text(
-                                    formState.sizeErrorMessage.value!!,
+                                if (formState.sizeErrorMessage != null) Text(
+                                    formState.sizeErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -350,11 +382,11 @@ fun FormularyEditor(
                                 Text(stringResource(R.string.weight), style = MaterialTheme.typography.labelMedium)
                             },
                             suffix = { Text(stringResource(R.string.kg)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            isError = formState.weightErrorMessage.value != null,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal,   imeAction = ImeAction.Next),
+                            isError = formState.weightErrorMessage != null,
                             supportingText = {
-                                if (formState.weightErrorMessage.value != null) Text(
-                                    formState.weightErrorMessage.value!!,
+                                if (formState.weightErrorMessage != null) Text(
+                                    formState.weightErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -385,11 +417,11 @@ fun FormularyEditor(
                                         .size(24.dp)
                                 )
                             },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            isError = formState.phoneErrorMessage.value != null,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone,  imeAction = ImeAction.Done),
+                            isError = formState.phoneErrorMessage != null,
                             supportingText = {
-                                if (formState.phoneErrorMessage.value != null) Text(
-                                    formState.phoneErrorMessage.value!!,
+                                if (formState.phoneErrorMessage != null) Text(
+                                    formState.phoneErrorMessage!!,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -430,8 +462,8 @@ fun FormularyEditor(
                     onUsDateSelected = { formState.changeUsDate(it) },
                     onCheckboxChange = { formState.onCheckboxChange(it) },
                     isFumReliable = formState.isFumReliable,
-                    weekErrorMessage = formState.weeksErrorMessage.value,
-                    daysErrorMessage = formState.daysErrorMessage.value,
+                    weekErrorMessage = formState.weeksErrorMessage,
+                    daysErrorMessage = formState.daysErrorMessage,
                 )
             },
             text = stringResource(R.string.rigth_method)
@@ -451,7 +483,7 @@ fun FormularyEditor(
             },
             content = {
                 RadioButtonsGroup(
-                    selectedIndexByDefault = formState.riskClassification.value.level,
+                    selectedIndexByDefault = formState.riskClassification.level,
                     options = setOf(
                         RadioOption(stringResource(R.string.low_risk), RiskClassification.LOW_RISK),
                         RadioOption(stringResource(R.string.higth_risk), RiskClassification.HEIGHT_RISK),

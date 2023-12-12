@@ -78,7 +78,7 @@ fun RecyclerItem(
                 AvatarImage(
                     size = 48.dp,
                     image = if (pregnant.photo.isNotEmpty()) pregnant.photo.convertToBitmap() else null,
-                    placeholder = R.drawable.profile,
+                    placeholder = R.drawable.woman_avatar,
                 )
 
                 Surface(
@@ -121,7 +121,11 @@ fun RecyclerItem(
                 .fillMaxWidth()
                 .padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painter = painterResource(R.drawable.ic_baby_svg), contentDescription = "FPP",modifier = Modifier.size(24.dp) )
+                    Icon(
+                        painter = painterResource(R.drawable.ic_baby_boy),
+                        contentDescription = "FPP",
+                        modifier = Modifier.size(24.dp)
+                    )
                     Spacer4()
                     Surface(
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -132,7 +136,7 @@ fun RecyclerItem(
                         Text(
                             pregnant.fpp,
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         )
                     }
 
@@ -148,14 +152,14 @@ fun RecyclerItem(
                             if (pregnant.isFUMReliable) pregnant.gestationalAgeByFUM
                             else pregnant.gestationalAgeByFirstUS
                         } sem",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
 
-            AnimatedContent(isExpanded, label = "Expand content") { expadable ->
-                if (expadable) {
+            AnimatedContent(isExpanded, label = "Expand content") { expandable ->
+                if (expandable) {
 //
                     Row(
                         modifier = modifier

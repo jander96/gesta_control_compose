@@ -50,7 +50,7 @@ fun CircularIndicator(
     foregroundIndicatorStrokeWidth: Float = canvasSize.value * 0.2f,
     indicatorStrokeCap: StrokeCap = StrokeCap.Round,
     bigTextFontSize: TextUnit = TextUnit(value = canvasSize.value * 0.20f, type = TextUnitType.Sp),
-    bigTextColor: Color = MaterialTheme.colorScheme.onSurface,
+    bigTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
     bigTextSuffix: String = "",
     smallText: String = "",
     smallTextColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
@@ -74,8 +74,7 @@ fun CircularIndicator(
 
     LaunchedEffect(allowedIndicatorValue){
         animatedIndicatorValue =
-            if (allowedIndicatorValue < maxIndicatorValue)
-                allowedIndicatorValue
+            if (allowedIndicatorValue < maxIndicatorValue) allowedIndicatorValue
             else maxIndicatorValue
     }
 

@@ -8,7 +8,9 @@ import android.provider.MediaStore
 import android.util.Base64
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -85,11 +87,14 @@ fun Context.getBitmapFromFile(photoFileName:String):Bitmap{
 }
 
 
-fun Bitmap.setImageFromBitmap(imageView: ImageView) {
+suspend fun Bitmap.compressQuality(quality: Int): Bitmap {
+    val scope = CoroutineScope(Dispatchers.Default)
     val byte = ByteArrayOutputStream()
-    compress(Bitmap.CompressFormat.JPEG, 100, byte)
-    val decode = BitmapFactory.decodeStream(ByteArrayInputStream(byte.toByteArray()))
-    imageView.setImageBitmap(decode)
+    val deferred =  scope.async {
+        compress(Bitmap.CompressFormat.PNG, quality, byte)
+        BitmapFactory.decodeStream(ByteArrayInputStream(byte.toByteArray()))
+    }
+    return deferred.await()
 }
 
 fun Bitmap.getResizeBitmap(with: Int, heigth: Int, filter: Boolean): Bitmap {

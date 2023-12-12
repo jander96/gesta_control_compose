@@ -3,7 +3,6 @@ package com.devj.gestantescontrolcompose.features.quick_calculator.view.screen
 import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,10 +58,7 @@ fun CalculatorPage(
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
 
-    Scaffold(
-        modifier = Modifier.background(Color.Red),
-
-        ) { paddingValues ->
+    Scaffold() { paddingValues ->
         ConstraintLayout(
             modifier = Modifier
                 .padding(paddingValues)
@@ -72,6 +67,7 @@ fun CalculatorPage(
             val (graph, switcher, card, fpp) = createRefs()
             val topGuide = createGuidelineFromTop(0.05f)
             val bottomGuide = createGuidelineFromBottom(0.20f)
+
 
             CalculatorSwitcher(
                 isByUs = viewState.isUsActive,

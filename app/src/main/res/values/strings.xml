@@ -31,4 +31,10 @@
     <string name="usg">USG</string>
     <string name="us_calculator_subtitle">Ingrese la E.G que tenía cuando se realizó el u/s genético del bebé</string>
     <string name="confirm">Confirmar</string>
+    <string name="required">requerido</string>
+    <string name="invalid">inválido</string>
+    <string name="only_numbers">solo números</string>
+    <string name="isRealible">¿Confiable?</string>
+    <string name="weeks">sem</string>
+    <string name="days">dias</string>
 </resources>
