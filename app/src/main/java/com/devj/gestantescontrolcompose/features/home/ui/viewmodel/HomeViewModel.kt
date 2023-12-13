@@ -29,7 +29,9 @@ class HomeViewModel @Inject constructor(
 
     override val mutableViewState = MutableStateFlow(HomeViewState())
 
-
+    init {
+        sendUiEvent(HomeIntent.EnterAtHome)
+    }
 
      override suspend fun process(action: HomeAction): HomeEffect {
         return when (action) {

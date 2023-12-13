@@ -102,11 +102,11 @@ fun MyApp(modifier: Modifier = Modifier) {
 
                 HomePage(
                     onItemClick = {
-                        navController.navigate(Edition.passParams(it))
+                        navController.launchSingleTopTo(Edition.passParams(it))
 
                     },
                     onFABClick = {
-                        navController.navigate(route = Edition.passParams(null))
+                        navController.launchSingleTopTo(route = Edition.passParams(null))
                     },
                     homeViewModel = hiltViewModel()
                 )

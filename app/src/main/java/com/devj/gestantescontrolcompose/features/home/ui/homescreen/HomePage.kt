@@ -37,8 +37,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,10 +76,10 @@ fun HomePage(
     homeViewModel: HomeViewModel
 ) {
 
-    val viewState by homeViewModel.viewState.collectAsState()
-    val listOfPregnant = viewState.pregnantList.collectAsStateWithLifecycle(emptyList())
+    val viewState by homeViewModel.viewState.collectAsStateWithLifecycle()
+    val listOfPregnant by viewState.pregnantList.collectAsStateWithLifecycle(initialValue = emptyList())
     val heightScreen = LocalConfiguration.current.screenHeightDp
-    val scrollState = rememberLazyListState()
+
     val scope = rememberCoroutineScope()
     var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
@@ -81,17 +87,16 @@ fun HomePage(
     var pregnantId by rememberSaveable {
         mutableStateOf<Int?>(null)
     }
-    
 
-    LaunchedEffect(key1 = homeViewModel.viewState) {
-        homeViewModel.sendUiEvent(HomeIntent.EnterAtHome)
-    }
 
     LaunchedEffect(key1 = viewState.activeFilter) {
         homeViewModel.sendUiEvent(HomeIntent.OnFilterClick(viewState.activeFilter))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+
+        val scrollState = rememberLazyListState()
+
         if(showDeleteDialog){
             DeleteDialog(
                 onAccept = {
@@ -113,9 +118,9 @@ fun HomePage(
             ) {
             HomeHeader(
                 stats = Stats(
-                    total = listOfPregnant.value.size,
-                    onRisk = listOfPregnant.value.count { it.riskClassification == RiskClassification.HEIGHT_RISK },
-                    onFinalPeriod = listOfPregnant.value.count {
+                    total = listOfPregnant.size,
+                    onRisk = listOfPregnant.count { it.riskClassification == RiskClassification.HEIGHT_RISK },
+                    onFinalPeriod = listOfPregnant.count {
                         if (it.isFUMReliable) {
                             it.gestationalAgeByFUM.toFloat() >= 37.0
                         } else {
@@ -149,7 +154,7 @@ fun HomePage(
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
             ) {
-                items(listOfPregnant.value) {
+                items(listOfPregnant) {
                     RecyclerItem(
                         pregnant = it,
                         onClick = { pregnant -> onItemClick(pregnant) },
@@ -196,7 +201,6 @@ fun FAB(onClick: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeHeader(
     modifier: Modifier = Modifier,
