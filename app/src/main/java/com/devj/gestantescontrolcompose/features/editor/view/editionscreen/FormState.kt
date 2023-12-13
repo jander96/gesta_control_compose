@@ -1,22 +1,26 @@
 package com.devj.gestantescontrolcompose.features.editor.view.editionscreen
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.FileProvider
 import androidx.core.text.isDigitsOnly
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.DataDate
 import com.devj.gestantescontrolcompose.common.domain.model.Measures
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
-import com.devj.gestantescontrolcompose.common.extensions.compressQuality
-import com.devj.gestantescontrolcompose.common.extensions.convertToString
+import com.devj.gestantescontrolcompose.common.extensions.createInternalFileFromImageUri
+import com.devj.gestantescontrolcompose.common.extensions.timeStamp
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import java.io.File
+import java.util.Calendar
 
+const val AUTHORITY = "com.devj.gestantescontrolcompose.fileprovider"
 class FormState ( private val context: Context) {
 
     var id by mutableIntStateOf(0)
@@ -93,7 +97,6 @@ class FormState ( private val context: Context) {
     }
 
 
-
     fun buildPregnant(): Pregnant {
        return  Pregnant(
             id = id,
@@ -168,15 +171,6 @@ class FormState ( private val context: Context) {
         _isLoading = !_isLoading
     }
 
-    suspend fun savePhoto(bitmap: Bitmap){
-
-            toggleLoadingState()
-            bitmap.compressQuality(3).also { compressedBitmap ->
-                changePhoto(compressedBitmap.convertToString())
-                toggleLoadingState()
-            }
-
-    }
 
     private fun validateName(name: String):String?{
         if(name.isBlank()) return context.getString(R.string.required)
@@ -273,8 +267,16 @@ class FormState ( private val context: Context) {
         _isFumReliable = isChecked
     }
 
-    fun changePhoto(photo: String){
-        _photo = photo
+
+    fun updatePhotoUri(uri: Uri){
+        _photo = uri.toString()
+    }
+
+    fun createImageCopy(originUri: Uri): Uri{
+        val name = Calendar.getInstance().timeStamp(".jpg")
+        context.createInternalFileFromImageUri(originUri, name)
+        val file = File(context.filesDir,name )
+        return FileProvider.getUriForFile(context, AUTHORITY, file)
     }
 
     fun changeRiskClassification(classification: RiskClassification){

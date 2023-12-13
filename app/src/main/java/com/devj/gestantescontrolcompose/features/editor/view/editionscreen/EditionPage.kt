@@ -5,6 +5,8 @@ package com.devj.gestantescontrolcompose.features.editor.view.editionscreen
 
 import android.Manifest
 import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -52,14 +54,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
-import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
-import com.devj.gestantescontrolcompose.common.extensions.convertToString
 import com.devj.gestantescontrolcompose.common.extensions.getBitmap
+import com.devj.gestantescontrolcompose.common.extensions.timeStamp
 import com.devj.gestantescontrolcompose.common.service.ContactManager
 import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.composables.ExpandableSection
@@ -70,7 +72,8 @@ import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
-import kotlinx.coroutines.launch
+import java.io.File
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,40 +81,69 @@ fun EditionPage(
     pregnantId: Int?,
     editionViewModel: EditionViewModel = hiltViewModel(),
     onSaveTap: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val contactManager = ContactManager(context)
     val state by editionViewModel.viewState.collectAsStateWithLifecycle()
     var pregnant: PregnantUI? by remember { mutableStateOf(null) }
     pregnant = state.pregnant
-    val contactManager = ContactManager(context)
     val formState = FormState(context,pregnant)
-    val scope  = rememberCoroutineScope()
     var photo : Bitmap? by remember{  mutableStateOf(null) }
 
+
+    //Temporary
+    val fileName = Calendar.getInstance().timeStamp(".jpg")
+    val photoFile = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),fileName )
+    val photoUri = FileProvider.getUriForFile(context, AUTHORITY, photoFile)
+    val scope = rememberCoroutineScope()
+
     SideEffect {
-        photo = formState.photo?.convertToBitmap()
+        formState.photo?.let {
+            if(it.isNotBlank()){ photo = context.getBitmap(Uri.parse(it)) }
+        }
     }
 
     val camLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-            it?.let {
-                photo = it
-                formState.changePhoto(it.convertToString())
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {success ->
+            if(success){
+                photo = context.getBitmap(photoUri)
+                formState.updatePhotoUri(photoUri)
             }
         }
 
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
             it?.let { uri ->
-              photo =  context.getBitmap(uri).also { bitmap ->
-                    scope.launch {
-                         formState.savePhoto(bitmap)
-                    }
-                }
+                    val newUri = formState.createImageCopy(uri)
+                    photo = context.getBitmap(newUri)
+                    formState.updatePhotoUri(newUri)
             }
         }
 
+    val readMediaStorePermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                galleryLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+            }
+        }
+
+    val contactLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) { uri ->
+            uri?.let {
+                val numberPhone = contactManager.getContactFromUri(it)
+                formState.changePhone(numberPhone ?: "")
+            }
+        }
+    val contactPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                contactLauncher.launch()
+            }
+        }
 
     LaunchedEffect(pregnantId) {
         if (pregnantId != null && pregnantId != 0) {
@@ -128,7 +160,7 @@ fun EditionPage(
         Toast.makeText(LocalContext.current, it.message, Toast.LENGTH_LONG).show()
     }
 
-    Scaffold(modifier = modifier.padding(horizontal = 16.dp)) { paddingValues ->
+    Scaffold(modifier = Modifier.padding(horizontal = 16.dp)) { paddingValues ->
         val scrollState = rememberScrollState()
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -151,21 +183,22 @@ fun EditionPage(
                     modifier = Modifier.padding(16.dp),
                     image = photo,
                     onCameraClick = {
-                        camLauncher.launch()
+
+
+                        camLauncher.launch(photoUri)
                     },
                     onGalleryClick = {
-                        galleryLauncher.launch(
-                            PickVisualMediaRequest(
-                                ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
-                        )
+                        readMediaStorePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+
                     },
                     isLoading = formState.isLoading,
                 )
 
                 FormularyEditor(
                     formState = formState,
-                    contactManager = contactManager,
+                    onContactClick = {
+                        contactPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                    }
                 )
 
                 Spacer(modifier = Modifier.size(height = 56.dp, width = 0.dp))
@@ -241,26 +274,8 @@ fun HeaderEditor(
 fun FormularyEditor(
     modifier: Modifier = Modifier,
     formState: FormState,
-    contactManager: ContactManager,
+    onContactClick: ()->Unit,
 ) {
-
-
-    val contactLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) { uri ->
-            uri?.let {
-                val numberPhone = contactManager.getContactFromUri(it)
-                formState.changePhone(numberPhone ?: "")
-            }
-        }
-    val permissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                contactLauncher.launch()
-            }
-        }
-
-
-
     Column {
 
         ExpandableSection(
@@ -408,12 +423,10 @@ fun FormularyEditor(
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_contacts_svg),
-                                    contentDescription = "",
+                                    contentDescription = "pick contact",
                                     modifier = modifier
                                         .padding(16.dp)
-                                        .clickable {
-                                            permissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-                                        }
+                                        .clickable { onContactClick() }
                                         .size(24.dp)
                                 )
                             },

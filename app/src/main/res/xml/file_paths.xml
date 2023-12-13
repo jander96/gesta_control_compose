@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- definiendo una ruta de acceso a los archivos externos de la aplicación.
+ La ruta de acceso gesta_control_images apunta a la carpeta Pictures. -->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-files-path
+        name="gesta_control_images"
+        path="Pictures"/>
+
+    <files-path name="internal_files" path="." />
+
+</paths>
+

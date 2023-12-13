@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.util.Calendar
 
 fun Bitmap.convertToString(): String {
     val byteArrayOutputStream = ByteArrayOutputStream()
@@ -69,15 +70,13 @@ fun Int?.ifNullReturnEmpty(): String{
     }
 }
 
-fun Context.createInternalFileFromImageUri(uri: Uri): Boolean {
+fun Context.createInternalFileFromImageUri(uri: Uri, fileName: String): Boolean {
 
     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
-    val isFileSuccess =
-        openFileOutput("$uri.jpeg", Context.MODE_PRIVATE).use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, it)
+    return openFileOutput(fileName, Context.MODE_PRIVATE).use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, it)
         }
-    return isFileSuccess
 }
 fun Context.getBitmapFromFile(photoFileName:String):Bitmap{
     val bytes = openFileInput(photoFileName).use { fileInputStream ->
@@ -114,4 +113,9 @@ fun Double.getIMClassification(): String{
         in 35.0..39.9 -> "obesidad II"
         else ->"obesidad III"
     }
+}
+
+fun Calendar.timeStamp(suffix: String): String{
+    val timeStamp = Calendar.getInstance().timeInMillis
+    return  "file_$timeStamp$suffix"
 }

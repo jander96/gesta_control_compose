@@ -1,5 +1,6 @@
 package com.devj.gestantescontrolcompose.features.home.ui.composables
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -31,14 +32,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
-import com.devj.gestantescontrolcompose.common.extensions.convertToBitmap
+import com.devj.gestantescontrolcompose.common.extensions.getBitmap
 import com.devj.gestantescontrolcompose.common.extensions.getIMClassification
 import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.composables.CircularIndicator
@@ -56,9 +59,13 @@ fun RecyclerItem(
     }
     val expandedIcon =
         if (!isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp
+    val color =
+        if (pregnant.riskClassification == RiskClassification.HEIGHT_RISK)
+            MaterialTheme.colorScheme.tertiaryContainer
+        else MaterialTheme.colorScheme.background
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        colors = CardDefaults.cardColors(containerColor = color ),
         elevation = CardDefaults.cardElevation(1.dp),
         modifier = modifier
             .wrapContentHeight()
@@ -77,7 +84,7 @@ fun RecyclerItem(
             ) {
                 AvatarImage(
                     size = 48.dp,
-                    image = if (pregnant.photo.isNotEmpty()) pregnant.photo.convertToBitmap() else null,
+                    image = if (pregnant.photo.isNotEmpty()) LocalContext.current.getBitmap(Uri.parse(pregnant.photo)) else null,
                     placeholder = R.drawable.woman_avatar,
                 )
 
