@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.service.sms_service
+package com.devj.gestantescontrolcompose.features.scheduler.presenter.framework.work_manager
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.devj.gestantescontrolcompose.common.domain.model.Message
+import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,10 +26,8 @@ object Constants {
 
 @SuppressLint("EnqueueWork")
 class ScheduledSMS(
-    tag: String,
     context: Context,
     message: Message,
-    dateTime: String,
 ) {
 
     private val inputMessage: Data = workDataOf(
@@ -40,8 +38,8 @@ class ScheduledSMS(
 
     private val smsWork = OneTimeWorkRequestBuilder<SMSWorker>()
         .setInputData(inputMessage)
-        .setInitialDelay(calculateDelayByDateTime(dateTime))
-        .addTag(tag)
+        .setInitialDelay(calculateDelayByDateTime(message.dateTime))
+        .addTag(message.tag)
         .build()
 
     init {

@@ -36,7 +36,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -51,22 +51,16 @@ import com.devj.gestantescontrolcompose.common.ui.theme.GestantesControlComposeT
 import com.devj.gestantescontrolcompose.features.editor.view.editionscreen.EditionPage
 import com.devj.gestantescontrolcompose.features.home.ui.homescreen.HomePage
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.screen.CalculatorPage
-import com.devj.gestantescontrolcompose.features.scheduler.view.message_schedulescreen.MessageSchedulePage
+import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.screen.MessageSchedulePage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             GestantesControlComposeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MyApp()
-                }
+                MyApp()
             }
         }
     }
@@ -82,12 +76,12 @@ fun MyApp(modifier: Modifier = Modifier) {
     var showAppBar by rememberSaveable {
         mutableStateOf(true)
     }
-    val navState = navController.currentBackStackEntryAsState()
+    val navState by navController.currentBackStackEntryAsState()
 
-    LaunchedEffect(navState.value?.destination?.route ){
-        showAppBar = navState.value?.destination?.route == Home.route ||
-                navState.value?.destination?.route == Calculator.route ||
-                navState.value?.destination?.route == Scheduler.route
+    LaunchedEffect(navState?.destination?.route ){
+        showAppBar = navState?.destination?.route == Home.route ||
+                navState?.destination?.route == Calculator.route ||
+                navState?.destination?.route == Scheduler.route
     }
     Box() {
 
@@ -108,7 +102,6 @@ fun MyApp(modifier: Modifier = Modifier) {
                     onFABClick = {
                         navController.launchSingleTopTo(route = Edition.passParams(null))
                     },
-                    homeViewModel = hiltViewModel()
                 )
             }
             composable(route = Calculator.route ) {
@@ -135,22 +128,27 @@ fun MyApp(modifier: Modifier = Modifier) {
 
             ) {
                 BottomNavigation(
-                    modifier = modifier
-                        .padding(4.dp)
-                ) { index ->
-                    when (index) {
-                        0 -> navController.launchSingleTopTo(Home.route)
-                        1 -> navController.launchSingleTopTo(Calculator.route)
-                        2 -> navController.launchSingleTopTo(Scheduler.route)
+                    modifier = modifier.padding(4.dp),
+                    navState = navState,
+                    onDestinationClick = { index ->
+                        when (index) {
+                            0 -> navController.launchSingleTopTo(Home.route)
+                            1 -> navController.launchSingleTopTo(Calculator.route)
+                            2 -> navController.launchSingleTopTo(Scheduler.route)
+                        }
                     }
-                }
+                )
             }
 
     }
 }
 
 @Composable
-fun BottomNavigation(modifier: Modifier = Modifier, onDestinationClick: (index: Int) -> Unit) {
+fun BottomNavigation(
+    modifier: Modifier = Modifier,
+    onDestinationClick: (index: Int) -> Unit,
+    navState: NavBackStackEntry?
+    ) {
 
 
     Row(modifier = modifier,horizontalArrangement = Arrangement.Center) {
@@ -171,7 +169,7 @@ fun BottomNavigation(modifier: Modifier = Modifier, onDestinationClick: (index: 
                 var index by rememberSaveable { mutableIntStateOf(0) }
 
                 NavigationBarItem(
-                    selected = index == 0,
+                    selected = navState?.destination?.route?.lowercase() == Home.route,
                     onClick = {
                         index = 0
                         onDestinationClick(index)
@@ -186,7 +184,7 @@ fun BottomNavigation(modifier: Modifier = Modifier, onDestinationClick: (index: 
                 )
 
                 NavigationBarItem(
-                    selected = index == 1,
+                    selected = navState?.destination?.route?.lowercase() == Calculator.route,
                     onClick = {
                         index = 1
                         onDestinationClick(index)
@@ -201,7 +199,7 @@ fun BottomNavigation(modifier: Modifier = Modifier, onDestinationClick: (index: 
                 )
 
                 NavigationBarItem(
-                    selected = index == 2,
+                    selected = navState?.destination?.route?.lowercase() == Scheduler.route,
                     onClick = {
                         index = 2
                         onDestinationClick(index)

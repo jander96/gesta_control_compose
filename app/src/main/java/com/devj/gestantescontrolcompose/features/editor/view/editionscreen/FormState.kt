@@ -272,9 +272,11 @@ class FormState ( private val context: Context) {
         _photo = uri.toString()
     }
 
-    fun createImageCopy(originUri: Uri): Uri{
+    suspend fun createImageCopy(originUri: Uri): Uri{
+        _isLoading = true
         val name = Calendar.getInstance().timeStamp(".jpg")
         context.createInternalFileFromImageUri(originUri, name)
+        _isLoading = false
         val file = File(context.filesDir,name )
         return FileProvider.getUriForFile(context, AUTHORITY, file)
     }

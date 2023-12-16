@@ -1,10 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 
 package com.devj.gestantescontrolcompose.features.editor.view.editionscreen
 
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
@@ -30,7 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,22 +58,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
-import com.devj.gestantescontrolcompose.common.extensions.getBitmap
 import com.devj.gestantescontrolcompose.common.extensions.timeStamp
 import com.devj.gestantescontrolcompose.common.service.ContactManager
-import com.devj.gestantescontrolcompose.common.ui.composables.AvatarImage
 import com.devj.gestantescontrolcompose.common.ui.composables.ExpandableSection
 import com.devj.gestantescontrolcompose.common.ui.composables.ImageSelectorRow
 import com.devj.gestantescontrolcompose.common.ui.composables.PregnantDateSelector
+import com.devj.gestantescontrolcompose.common.ui.composables.UriImage
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption
 import com.devj.gestantescontrolcompose.features.editor.view.viewmodel.EditionViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Calendar
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun EditionPage(
     pregnantId: Int?,
@@ -88,7 +86,7 @@ fun EditionPage(
     var pregnant: PregnantUI? by remember { mutableStateOf(null) }
     pregnant = state.pregnant
     val formState = FormState(context,pregnant)
-    var photo : Bitmap? by remember{  mutableStateOf(null) }
+    var photo : Uri? by remember{  mutableStateOf(null) }
 
 
     //Temporary
@@ -98,25 +96,32 @@ fun EditionPage(
     val scope = rememberCoroutineScope()
 
     SideEffect {
-        formState.photo?.let {
-            if(it.isNotBlank()){ photo = context.getBitmap(Uri.parse(it)) }
+        scope.launch {
+            formState.photo?.let {
+                if(it.isNotBlank()){ photo = Uri.parse(it) }
+            }
         }
     }
 
     val camLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {success ->
             if(success){
-                photo = context.getBitmap(photoUri)
-                formState.updatePhotoUri(photoUri)
+                scope.launch {
+                    photo = photoUri
+                    formState.updatePhotoUri(photoUri)
+                }
             }
         }
 
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
             it?.let { uri ->
+                scope.launch {
                     val newUri = formState.createImageCopy(uri)
-                    photo = context.getBitmap(newUri)
+                    photo = newUri
                     formState.updatePhotoUri(newUri)
+                }
+
             }
         }
 
@@ -239,7 +244,7 @@ fun EditionPage(
 
 @Composable
 fun HeaderEditor(
-    image: Bitmap?,
+    image: Uri?,
     modifier: Modifier = Modifier,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
@@ -251,7 +256,7 @@ fun HeaderEditor(
                 targetState = image,
                 label = "image_change_animation",
             ) {
-                AvatarImage(image = it, placeholder = R.drawable.woman_avatar)
+                UriImage(imageUri = it, placeholder = R.drawable.woman_avatar)
             }
 
             ImageSelectorRow(
@@ -269,7 +274,7 @@ fun HeaderEditor(
 }
 
 
-@ExperimentalMaterial3Api
+
 @Composable
 fun FormularyEditor(
     modifier: Modifier = Modifier,

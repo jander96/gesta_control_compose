@@ -1,9 +1,9 @@
-package com.devj.gestantescontrolcompose.common.service.sms_service
+package com.devj.gestantescontrolcompose.features.scheduler.presenter.framework.work_manager
 
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.devj.gestantescontrolcompose.common.domain.model.Message
+import com.devj.gestantescontrolcompose.common.service.sms_service.SMS
 
 class SMSWorker(
     private val context: Context,
@@ -13,13 +13,13 @@ class SMSWorker(
         val message = inputData.getString(Constants.KEY_MESSAGE) ?: return Result.failure()
         val phone = inputData.getString(Constants.KEY_PHONE) ?: return Result.failure()
 
-        return sendMessage(Message(phone, message))
+        return sendMessage(phone, message)
     }
 
-    private fun sendMessage(message: Message): Result {
+    private fun sendMessage(phone: String, message: String): Result {
         return try {
             val smsManager = SMS(context)
-            smsManager.send(message.phoneNumber, message.message)
+            smsManager.send(phone, message)
             Result.success()
 
         } catch (e: Exception) {

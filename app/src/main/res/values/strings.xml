@@ -37,4 +37,8 @@
     <string name="isRealible">¿Confiable?</string>
     <string name="weeks">sem</string>
     <string name="days">dias</string>
+    <string name="message_quantity">Tienes %1$s mensajes programados para hoy</string>
+    <string name="cost">Costo</string>
+    <string name="acumm">Acumulado</string>
+    <string name="remitters">Remitentes:</string>
 </resources>

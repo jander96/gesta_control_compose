@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 
@@ -38,7 +39,10 @@ fun exitToEnd(): ExitTransition{
         animationSpec = tween(800, 100),
         targetOffsetX = {width-> width }
     ) + fadeOut(
-        animationSpec = tween(800, 100))
+        animationSpec = tween(800, 100)
+    )+ scaleOut(
+       animationSpec = tween(800, 100),
+    )
 }
 
 fun exitToStart(): ExitTransition{
@@ -46,5 +50,8 @@ fun exitToStart(): ExitTransition{
         animationSpec = tween(800, 100),
         targetOffsetX = {width-> -width }
     ) + fadeOut(
-        animationSpec = tween(800, 100))
+        animationSpec = tween(800, 100)
+    )+ scaleOut(
+        animationSpec = tween(800, 100),
+    )
 }

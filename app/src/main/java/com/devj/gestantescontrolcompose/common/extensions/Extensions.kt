@@ -17,7 +17,12 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 import java.util.UUID
 
 fun Bitmap.convertToString(): String {
@@ -75,12 +80,13 @@ fun Int?.ifNullReturnEmpty(): String{
     }
 }
 
-fun Context.createInternalFileFromImageUri(uri: Uri, fileName: String): Boolean {
+suspend fun Context.createInternalFileFromImageUri(uri: Uri, fileName: String): Boolean {
 
     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+    val compressedBitmap = bitmap.compressQuality(1)
 
     return openFileOutput(fileName, Context.MODE_PRIVATE).use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, it)
+        compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
         }
 }
 fun Context.getBitmapFromFile(photoFileName:String):Bitmap{
@@ -167,4 +173,30 @@ fun Context.writeBitmapToFile(
             }
         }
     }
+}
+
+fun Double.toCurrency(): String{
+    val formatter = NumberFormat.getCurrencyInstance(Locale.US)
+    return formatter.format(this)
+}
+
+fun String.toLabelDate(): String{
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("EEEE dd 'de' MMMM", Locale.getDefault())
+    val date = inputFormat.parse(this)
+
+    return outputFormat.format(date)
+
+}
+
+fun LocalDateTime.toDateString(): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return formatter.format(this)
+}
+
+fun String.easeDatetime():String{
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    val date = inputFormat.parse(this)
+    val outputFormat = SimpleDateFormat("dd 'de' MMMM h:mm a", Locale.getDefault())
+    return  outputFormat.format(date)
 }

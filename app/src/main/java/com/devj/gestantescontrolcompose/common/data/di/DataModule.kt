@@ -1,4 +1,4 @@
-package com.devj.gestantescontrol.data.di
+package com.devj.gestantescontrolcompose.common.data.di
 
 
 import android.content.Context

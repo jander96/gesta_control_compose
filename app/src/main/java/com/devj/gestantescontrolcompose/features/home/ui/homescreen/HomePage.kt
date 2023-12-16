@@ -33,7 +33,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -53,9 +53,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
+import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.SpacerBy
 import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
@@ -70,15 +72,15 @@ import com.devj.gestantescontrolcompose.features.home.ui.viewmodel.HomeViewModel
 @ExperimentalMaterial3Api
 @Composable
 fun HomePage(
-    modifier: Modifier = Modifier,
     onItemClick: (pregnant: PregnantUI) -> Unit,
     onFABClick: () -> Unit,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
     val viewState by homeViewModel.viewState.collectAsStateWithLifecycle()
-    val listOfPregnant by viewState.pregnantList.collectAsStateWithLifecycle(initialValue = emptyList())
+    val listOfPregnant by viewState.pregnantList.collectAsStateWithLifecycle( emptyList())
     val heightScreen = LocalConfiguration.current.screenHeightDp
+    val scrollState = rememberLazyListState()
 
     val scope = rememberCoroutineScope()
     var showDeleteDialog by rememberSaveable {
@@ -92,30 +94,38 @@ fun HomePage(
     LaunchedEffect(key1 = viewState.activeFilter) {
         homeViewModel.sendUiEvent(HomeIntent.OnFilterClick(viewState.activeFilter))
     }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        val scrollState = rememberLazyListState()
-
-        if(showDeleteDialog){
-            DeleteDialog(
-                onAccept = {
-                    showDeleteDialog = false
-                    pregnantId?.let {
-                        homeViewModel.sendUiEvent(HomeIntent.OnDeletePressed(it))
-                    }
-                }, onDismiss = { showDeleteDialog = false }
-            )
-        }
-        Surface(
-            color = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((heightScreen * 0.35).dp)
-                .align(Alignment.TopCenter),
-
+    Scaffold(
+        floatingActionButton = {
+            AnimatedVisibility(
+                scrollState.isScrollInProgress.not() ,
+                enter = slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing)
+                ),
+                exit  = slideOutVertically(
+                    targetOffsetY = { fullHeight -> fullHeight },
+                    animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
+                ),
+                modifier = Modifier
+                    .padding(bottom = 56.dp, end = 23.dp),
             ) {
+                FAB(onFABClick)
+            }
+        }
+    ) {
+        Column(modifier = Modifier.fillMaxSize().padding(it)) {
+
+            if(showDeleteDialog){
+                DeleteDialog(
+                    onAccept = {
+                        showDeleteDialog = false
+                        pregnantId?.let {
+                            homeViewModel.sendUiEvent(HomeIntent.OnDeletePressed(it))
+                        }
+                    }, onDismiss = { showDeleteDialog = false }
+                )
+            }
+            Spacer16()
             HomeHeader(
                 stats = Stats(
                     total = listOfPregnant.size,
@@ -136,21 +146,10 @@ fun HomePage(
                 },
                 filterType = viewState.activeFilter
             )
-        }
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((heightScreen * 0.70).dp)
-                .align(Alignment.BottomCenter),
-            shape = MaterialTheme.shapes.medium.copy(
-                topStart = CornerSize(20.dp),
-                topEnd = CornerSize(20.dp)
-            )
-        ) {
 
             LazyColumn(
                 state = scrollState,
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
             ) {
@@ -163,29 +162,12 @@ fun HomePage(
                             pregnantId = pregnant.id
                         })
                 }
-                item { 
+                item {
                     Spacer(modifier = Modifier.height(96.dp))
                 }
             }
-        }
 
-        AnimatedVisibility(
-            scrollState.isScrollInProgress.not() ,
-            enter = slideInVertically(
-                initialOffsetY = { fullHeight -> -fullHeight },
-                animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing)
-            ),
-            exit  = slideOutVertically(
-                targetOffsetY = { fullHeight -> fullHeight },
-                animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
-            ),
-            modifier = modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 56.dp, end = 23.dp),
-        ) {
-            FAB(onFABClick)
         }
-
     }
 }
 
@@ -200,7 +182,6 @@ fun FAB(onClick: () -> Unit, modifier: Modifier = Modifier) {
         Icon(imageVector = Icons.Default.Add, contentDescription = "")
     }
 }
-
 @Composable
 fun HomeHeader(
     modifier: Modifier = Modifier,
@@ -250,7 +231,6 @@ fun HomeHeader(
                         unfocusedIndicatorColor = Color.Transparent,
                     )
                 )
-
                 Box {
 
                     IconButton(onClick = {
@@ -263,7 +243,6 @@ fun HomeHeader(
                                 .size(24.dp)
                         )
                     }
-
 
                     DropdownMenu(
                         expanded = isContextMenuVisible,
@@ -302,11 +281,7 @@ fun HomeHeader(
 
                     }
                 }
-
-
-
             }
-
         }
 
 
@@ -322,10 +297,9 @@ fun HomeHeader(
                 .padding(horizontal = 32.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            StatCard(value = stats.total, label = stringResource(R.string.total), cardColor = MaterialTheme.colorScheme.secondaryContainer)
-            StatCard(value = stats.onRisk, label = stringResource(R.string.on_risk), cardColor = MaterialTheme.colorScheme.secondaryContainer)
-            StatCard(value = stats.onFinalPeriod, label = stringResource(R.string.on_last_period), cardColor = MaterialTheme.colorScheme.secondaryContainer)
-
+            StatCard(value = stats.total, label = stringResource(R.string.total), cardColor = MaterialTheme.colorScheme.primaryContainer)
+            StatCard(value = stats.onRisk, label = stringResource(R.string.on_risk), cardColor = MaterialTheme.colorScheme.primaryContainer)
+            StatCard(value = stats.onFinalPeriod, label = stringResource(R.string.on_last_period), cardColor = MaterialTheme.colorScheme.primaryContainer)
         }
         Spacer(modifier = Modifier.height(16.dp))
 
