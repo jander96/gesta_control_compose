@@ -6,7 +6,7 @@ workflows:
 
     environment:
       android_signing:
-        - keystore_reference
+        - gesta_control
       vars:
         PACKAGE_NAME: "com.devj.gestantescontrolcompose"
 
