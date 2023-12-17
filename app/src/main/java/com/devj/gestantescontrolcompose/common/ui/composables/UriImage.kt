@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +36,7 @@ fun UriImage(
     contentScale: ContentScale = ContentScale.Crop
 ) {
     val context = LocalContext.current
-    var imageBitmap: Bitmap? by rememberSaveable {
+    var imageBitmap: Bitmap? by remember {
         mutableStateOf(null)
     }
     LaunchedEffect(imageUri ){

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.screen
 
 import android.content.Context
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
@@ -34,10 +37,12 @@ import com.devj.gestantescontrolcompose.common.extensions.toDateString
 import com.devj.gestantescontrolcompose.features.home.ui.homescreen.FAB
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.MessageItem
+import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.ScheduleBottomSheet
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.ScheduleHeader
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.viewmodel.SchedulerViewModel
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageSchedulePage(
     viewModel: SchedulerViewModel = hiltViewModel()
@@ -46,10 +51,14 @@ fun MessageSchedulePage(
     val pregnantList by viewState.pregnantList.collectAsStateWithLifecycle(emptyList())
     val dateNow = LocalDateTime.now().toDateString()
     val scrollState = rememberLazyListState()
-
-    val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
     var send by remember {
         mutableStateOf(false)
+    }
+
+    var text by remember {
+        mutableStateOf("")
     }
 
     val smsPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){ granted ->
@@ -58,6 +67,15 @@ fun MessageSchedulePage(
         }
     }
     Box() {
+        ScheduleBottomSheet(
+            sheetState = sheetState,
+            showBottomSheet = showBottomSheet,
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            textMessage = text,
+            onTextMessageChange = {text = it},
+            listOfPregnant = pregnantList)
         
         Column(modifier = Modifier.padding(16.dp)) {
             ScheduleHeader(
@@ -102,7 +120,7 @@ fun MessageSchedulePage(
                 .align(Alignment.BottomEnd)
                 .padding(bottom = 56.dp, end = 23.dp),
         ) {
-            FAB(onClick = { })
+            FAB(onClick = { showBottomSheet = true })
         }
     }
 }
