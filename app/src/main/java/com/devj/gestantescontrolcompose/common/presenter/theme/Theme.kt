@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.ui.theme
+package com.devj.gestantescontrolcompose.common.presenter.theme
 
 import android.app.Activity
 import android.os.Build

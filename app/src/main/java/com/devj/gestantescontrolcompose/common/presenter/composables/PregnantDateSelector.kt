@@ -1,6 +1,5 @@
-package com.devj.gestantescontrolcompose.common.ui.composables
+package com.devj.gestantescontrolcompose.common.presenter.composables
 
-import android.icu.util.Calendar
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,15 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import com.devj.gestantescontrolcompose.R
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun PregnantDateSelector(
@@ -61,7 +50,7 @@ fun PregnantDateSelector(
     var showFumQuestion by rememberSaveable { mutableStateOf(false) }
 
     Column {
-        if (showFumCalendar) Calendar(
+        if (showFumCalendar) CalendarPicker(
             onDateSelected = {
                 it?.let {
                     onFumDateSelected(it)
@@ -70,7 +59,7 @@ fun PregnantDateSelector(
             },
             onClose = { showFumCalendar = false }
         )
-        if (showUsCalendar) Calendar(
+        if (showUsCalendar) CalendarPicker(
             onDateSelected = { it?.let { onUsDateSelected(it) } },
             onClose = { showUsCalendar = false })
 
@@ -176,42 +165,3 @@ fun PregnantDateSelector(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Calendar(
-    onDateSelected: (String?) -> Unit,
-    onClose: () -> Unit,
-) {
-    val pickerState = rememberDatePickerState()
-
-    DatePickerDialog(
-        modifier = Modifier.padding(16.dp),
-        onDismissRequest = onClose,
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-
-        confirmButton = {
-            ElevatedButton(onClick = {
-                val millis = pickerState.selectedDateMillis
-                val date = millis?.let {
-                    val formatter = DateTimeFormatter.ISO_DATE
-                    val localDate = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC")).toLocalDate()
-                    localDate.format(formatter)
-                }
-                onDateSelected(date)
-                onClose()
-            }) {
-                Text(stringResource(R.string.confirm))
-            }
-
-        }) {
-        DatePicker(
-            dateFormatter = DatePickerFormatter(selectedDateSkeleton = "yyyy-MM-dd"),
-            state = pickerState,
-            dateValidator = {milliseconds ->
-                milliseconds < Calendar.getInstance().timeInMillis
-            }
-        )
-    }
-
-}

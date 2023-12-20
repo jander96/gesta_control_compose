@@ -41,9 +41,9 @@ import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 import com.devj.gestantescontrolcompose.common.extensions.getIMClassification
-import com.devj.gestantescontrolcompose.common.ui.composables.CircularIndicator
-import com.devj.gestantescontrolcompose.common.ui.composables.UriImage
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.composables.CircularIndicator
+import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
 @Composable
 fun RecyclerItem(
@@ -129,7 +129,7 @@ fun RecyclerItem(
                     Icon(
                         painter = painterResource(R.drawable.ic_baby_boy),
                         contentDescription = "FPP",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(28.dp),
                     )
                     Spacer4()
                     Surface(

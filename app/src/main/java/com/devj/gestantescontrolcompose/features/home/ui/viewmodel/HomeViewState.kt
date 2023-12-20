@@ -1,7 +1,7 @@
 package com.devj.gestantescontrolcompose.features.home.ui.viewmodel
 
 import com.devj.gestantescontrolcompose.common.basemvi.MviViewState
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

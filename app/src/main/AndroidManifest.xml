@@ -24,6 +24,7 @@
         android:theme="@style/Theme.GestantesControlCompose"
         tools:targetApi="31">
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".app.MainActivity"
             android:exported="true"
             android:label="@string/app_name"

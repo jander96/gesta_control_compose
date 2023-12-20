@@ -34,14 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
-import com.devj.gestantescontrolcompose.common.extensions.easeDatetime
-import com.devj.gestantescontrolcompose.common.ui.composables.UriImage
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 
 @Composable
@@ -78,7 +78,29 @@ fun MessageItem(
                     .padding(8.dp)
                     .fillMaxWidth()
             ) {
-                Spacer16()
+                Row(horizontalArrangement = Arrangement.Start) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_timer_svg),
+                            contentDescription = "FPP",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer4()
+                        Surface(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = MaterialTheme.shapes.small.copy(CornerSize(15.dp)),
+                            tonalElevation = 1.dp,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        ){
+                            Text(
+                                DateTimeHelper.ymdToHumanReadableDate(message.dateTime),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            )
+                        }
+
+                    }
+                }
 
 
                 Surface(
@@ -101,39 +123,11 @@ fun MessageItem(
             ) {
                 Text(
                     message.message,
-                    overflow = TextOverflow.Ellipsis,
-
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Justify
                 )
             }
-
             Spacer16()
-            Row(modifier = modifier
-                .fillMaxWidth()
-                .padding(8.dp), horizontalArrangement = Arrangement.Start) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_timer_svg),
-                        contentDescription = "FPP",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer4()
-                    Surface(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        shape = MaterialTheme.shapes.small.copy(CornerSize(15.dp)),
-                        tonalElevation = 1.dp,
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    ){
-                        Text(
-                            message.dateTime.easeDatetime(),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        )
-                    }
-
-                }
-            }
-
             AnimatedContent(isExpanded, label = "Expand content") { expandable ->
 
                 if (expandable) {
@@ -148,7 +142,7 @@ fun MessageItem(
                         ) {
                             Column() {
                                 Text(
-                                    text = stringResource(R.string.remitters),
+                                    text = stringResource(R.string.addressee),
                                     style = MaterialTheme.typography.labelMedium
                                 )
                                 LazyRow() {
@@ -156,7 +150,7 @@ fun MessageItem(
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                             UriImage(
                                                 modifier = Modifier.padding(4.dp),
-                                                size = 48.dp,
+                                                size = 40.dp,
                                                 imageUri = if (pregnant.photo.isNotEmpty()) Uri.parse(
                                                     pregnant.photo
                                                 ) else null,

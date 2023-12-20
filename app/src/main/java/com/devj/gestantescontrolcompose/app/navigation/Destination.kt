@@ -2,7 +2,7 @@ package com.devj.gestantescontrolcompose.app.navigation
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
 
 interface Destination{

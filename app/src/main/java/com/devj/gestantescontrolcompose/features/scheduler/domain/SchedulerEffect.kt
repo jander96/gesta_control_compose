@@ -5,6 +5,13 @@ import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import kotlinx.coroutines.flow.Flow
 
 sealed class SchedulerEffect: MviResult{
+
+    object EventSaw: SchedulerEffect()
+
+    sealed class SaveMessage: SchedulerEffect(){
+        object Success : SaveMessage()
+        data class Error(val error: Throwable): SaveMessage()
+    }
     sealed class InitialLoad : SchedulerEffect(){
         data class Success(
             val listOfPregnant: Flow<List<Pregnant>>,
@@ -12,4 +19,10 @@ sealed class SchedulerEffect: MviResult{
         ) : InitialLoad()
         data class Error(val error: Throwable): InitialLoad()
     }
+    sealed class UpdateField: SchedulerEffect(){
+        data class Date(val date: String): UpdateField()
+        data class Time(val time: String): UpdateField()
+        data class Text(val text: String): UpdateField()
+    }
+    data class UpdatedAddressed(val addressee: List<String>): SchedulerEffect()
 }

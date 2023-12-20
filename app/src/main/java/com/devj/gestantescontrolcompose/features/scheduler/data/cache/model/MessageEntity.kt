@@ -9,24 +9,23 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 data class MessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @ColumnInfo(name = "phone_number")
-    val phoneNumber: String,
     val message: String,
     @ColumnInfo(name = "date_time")
     val dateTime: String,
     val tag: String,
+    val addressees: List<String>
 ) {
     companion object {
         fun fromDomain(message: Message) =
             MessageEntity(
                 id = message.id,
-                phoneNumber = message.phoneNumber,
                 message = message.message,
                 dateTime = message.dateTime,
-                tag = message.tag
+                tag = message.tag,
+                addressees = message.addressees
             )
     }
 
     fun toDomain(): Message =
-        Message(id,phoneNumber, message, dateTime, tag)
+        Message(id, message, dateTime, tag,addressees)
 }

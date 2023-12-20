@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.ui.composables
+package com.devj.gestantescontrolcompose.common.presenter.composables
 
 import androidx.annotation.RawRes
 import androidx.compose.runtime.Composable

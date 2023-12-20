@@ -59,12 +59,12 @@ import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.timeStamp
+import com.devj.gestantescontrolcompose.common.presenter.composables.ExpandableSection
+import com.devj.gestantescontrolcompose.common.presenter.composables.ImageSelectorRow
+import com.devj.gestantescontrolcompose.common.presenter.composables.PregnantDateSelector
+import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.common.service.ContactManager
-import com.devj.gestantescontrolcompose.common.ui.composables.ExpandableSection
-import com.devj.gestantescontrolcompose.common.ui.composables.ImageSelectorRow
-import com.devj.gestantescontrolcompose.common.ui.composables.PregnantDateSelector
-import com.devj.gestantescontrolcompose.common.ui.composables.UriImage
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioButtonsGroup
 import com.devj.gestantescontrolcompose.features.editor.view.composables.RadioOption

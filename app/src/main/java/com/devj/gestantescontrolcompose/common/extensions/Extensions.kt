@@ -18,9 +18,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
@@ -180,23 +177,6 @@ fun Double.toCurrency(): String{
     return formatter.format(this)
 }
 
-fun String.toLabelDate(): String{
-    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val outputFormat = SimpleDateFormat("EEEE dd 'de' MMMM", Locale.getDefault())
-    val date = inputFormat.parse(this)
 
-    return outputFormat.format(date)
 
-}
 
-fun LocalDateTime.toDateString(): String {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    return formatter.format(this)
-}
-
-fun String.easeDatetime():String{
-    val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-    val date = inputFormat.parse(this)
-    val outputFormat = SimpleDateFormat("dd 'de' MMMM h:mm a", Locale.getDefault())
-    return  outputFormat.format(date)
-}

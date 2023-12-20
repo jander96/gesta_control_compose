@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.ui.composables
+package com.devj.gestantescontrolcompose.common.presenter.composables
 
 
 import androidx.compose.animation.animateColorAsState

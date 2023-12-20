@@ -47,7 +47,7 @@ import com.devj.gestantescontrolcompose.app.navigation.Edition
 import com.devj.gestantescontrolcompose.app.navigation.Home
 import com.devj.gestantescontrolcompose.app.navigation.Scheduler
 import com.devj.gestantescontrolcompose.app.navigation.launchSingleTopTo
-import com.devj.gestantescontrolcompose.common.ui.theme.GestantesControlComposeTheme
+import com.devj.gestantescontrolcompose.common.presenter.theme.GestantesControlComposeTheme
 import com.devj.gestantescontrolcompose.features.editor.view.editionscreen.EditionPage
 import com.devj.gestantescontrolcompose.features.home.ui.homescreen.HomePage
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.screen.CalculatorPage

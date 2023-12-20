@@ -20,8 +20,7 @@ import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 import com.devj.gestantescontrolcompose.common.extensions.Spacer8
 import com.devj.gestantescontrolcompose.common.extensions.toCurrency
-import com.devj.gestantescontrolcompose.common.extensions.toLabelDate
-import com.devj.gestantescontrolcompose.common.ui.composables.UriImage
+import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
 
 @Composable
 fun ScheduleHeader(
@@ -38,7 +37,8 @@ fun ScheduleHeader(
             UriImage(imageUri = null, placeholder = R.drawable.woman_avatar, size = 40.dp )
             Spacer8()
             Column {
-                Text(text = date.toLabelDate(), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+                Text(text = date ,
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
                 Text(text = username, style = MaterialTheme.typography.labelLarge)
             }
         }
@@ -63,14 +63,18 @@ fun ScheduleCard(
     totalCost: Double,
     ) {
     Card(modifier = modifier) {
+        val title = when(messageQuantity){
+            0-> stringResource(R.string.no_message)
+            1-> stringResource(R.string.message_quantity, messageQuantity)
+            else -> stringResource(R.string.message_quantity, messageQuantity)
+        }
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = stringResource(R.string.message_quantity, messageQuantity), style = MaterialTheme.typography.titleMedium)
+            Text(text =title, style = MaterialTheme.typography.titleMedium)
             Spacer4()
             Divider()
             Spacer4()
             FinanceRow(text = stringResource(R.string.cost), price = currentCost)
             FinanceRow(text = stringResource(R.string.acumm), price = accumulatedCost)
-            FinanceRow(text = stringResource(R.string.total), price = totalCost)
         }
     }
 }

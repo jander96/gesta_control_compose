@@ -3,7 +3,7 @@ package com.devj.gestantescontrolcompose.features.home.ui.viewmodel
 import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
 import com.devj.gestantescontrolcompose.common.domain.usescases.DeletePregnantById
 import com.devj.gestantescontrolcompose.common.domain.usescases.GetAllPregnant
-import com.devj.gestantescontrolcompose.common.ui.model.UIMapper
+import com.devj.gestantescontrolcompose.common.presenter.model.UIMapper
 import com.devj.gestantescontrolcompose.features.home.domain.HomeAction
 import com.devj.gestantescontrolcompose.features.home.domain.HomeEffect
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent

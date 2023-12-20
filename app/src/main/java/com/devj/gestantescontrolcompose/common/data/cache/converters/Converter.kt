@@ -29,4 +29,13 @@ class Converter {
         }
         return result
     }
+
+    @TypeConverter
+    fun listOfPhoneToString(list: List<String>): String{
+        return list.joinToString(",")
+    }
+    @TypeConverter
+    fun listFromStringOfPhone(string: String):List<String>{
+       return string.split(",")
+    }
 }

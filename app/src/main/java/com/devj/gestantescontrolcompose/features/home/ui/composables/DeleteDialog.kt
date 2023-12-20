@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -13,8 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import com.devj.gestantescontrolcompose.common.extensions.Spacer16
+import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 
 @Composable
 fun DeleteDialog(
@@ -24,20 +24,19 @@ fun DeleteDialog(
 ) {
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties()
     ) {
-        Card(modifier = modifier.padding(16.dp)) {
+        Card() {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.padding(16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             ) {
-                Text("Estas seguro de eliminar?")
-                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                Text("¿Estás seguro de eliminar?", style = MaterialTheme.typography.titleMedium)
+                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
                     TextButton(onClick = onDismiss) {
                         Text("No")
                     }
-                    Spacer16()
+                    Spacer4()
                     TextButton(onClick = onAccept) {
                         Text("Si")
                     }

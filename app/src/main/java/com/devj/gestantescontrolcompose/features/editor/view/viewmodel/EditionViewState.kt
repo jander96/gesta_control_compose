@@ -2,7 +2,7 @@ package com.devj.gestantescontrolcompose.features.editor.view.viewmodel
 
 import com.devj.gestantescontrolcompose.common.basemvi.MviViewState
 import com.devj.gestantescontrolcompose.common.domain.Event
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
 data class EditionViewState(
     val pregnant: PregnantUI? = null,

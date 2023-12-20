@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.ui.model
+package com.devj.gestantescontrolcompose.common.presenter.model
 
 
 import android.os.Parcelable

@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.common.ui.theme
+package com.devj.gestantescontrolcompose.common.presenter.theme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF4856B0)

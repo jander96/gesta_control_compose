@@ -59,7 +59,7 @@ import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.SpacerBy
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
 import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 import com.devj.gestantescontrolcompose.features.home.domain.model.Stats

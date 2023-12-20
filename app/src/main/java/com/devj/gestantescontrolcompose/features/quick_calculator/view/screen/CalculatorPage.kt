@@ -1,6 +1,5 @@
 package com.devj.gestantescontrolcompose.features.quick_calculator.view.screen
 
-import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -40,8 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
-import com.devj.gestantescontrolcompose.common.ui.composables.Calendar
-import com.devj.gestantescontrolcompose.common.ui.composables.CircularIndicator
+import com.devj.gestantescontrolcompose.common.presenter.composables.CalendarPicker
+import com.devj.gestantescontrolcompose.common.presenter.composables.CircularIndicator
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorIntent
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.enterFromEnd
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.enterFromStart
@@ -49,6 +48,7 @@ import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.exi
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.exitToStart
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.composables.CustomSwitcher
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.viewmodel.CalculatorViewModel
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
@@ -170,8 +170,8 @@ fun DecoratedFPP(
         val formatter = SimpleDateFormat("dd 'de' MMMM 'de' yyyy", Locale("es", "ES"))
         val formattedDate = formatter.format(SimpleDateFormat("yyyy-MM-dd").parse(date))
         Row {
-            Text("FPP: ")
-            Text(formattedDate)
+            Text("FPP: ",style = MaterialTheme.typography.titleMedium)
+            Text(formattedDate,style = MaterialTheme.typography.titleMedium)
 
         }
     }
@@ -273,7 +273,7 @@ fun FUM(
 
 
     if (isCalendarVisible)
-        Calendar(
+        CalendarPicker(
             onDateSelected = {
                 it?.let { onFumDateSelected(it) }
                 isCalendarVisible = false
@@ -346,7 +346,7 @@ fun USG(
         }
 
         if (isCalendarVisible)
-            Calendar(
+            CalendarPicker(
                 onDateSelected = {
                     it?.let { onUsDateSelected(it) }
                     isCalendarVisible = false

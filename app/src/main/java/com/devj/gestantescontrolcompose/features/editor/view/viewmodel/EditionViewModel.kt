@@ -4,7 +4,7 @@ import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
 import com.devj.gestantescontrolcompose.common.domain.Event
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.common.domain.usescases.GetPregnant
-import com.devj.gestantescontrolcompose.common.ui.model.UIMapper
+import com.devj.gestantescontrolcompose.common.presenter.model.UIMapper
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionAction
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionEffect
 import com.devj.gestantescontrolcompose.features.editor.domain.EditionIntent

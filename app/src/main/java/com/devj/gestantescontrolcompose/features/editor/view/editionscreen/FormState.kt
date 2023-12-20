@@ -16,7 +16,7 @@ import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.createInternalFileFromImageUri
 import com.devj.gestantescontrolcompose.common.extensions.timeStamp
-import com.devj.gestantescontrolcompose.common.ui.model.PregnantUI
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import java.io.File
 import java.util.Calendar
 
