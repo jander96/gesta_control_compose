@@ -37,11 +37,12 @@
     <string name="isRealible">¿Confiable?</string>
     <string name="weeks">sem</string>
     <string name="days">dias</string>
-    <string name="message_quantity">%1$s mensajes para hoy</string>
-    <string name="message_quantity_single">%1$s mensaje para hoy</string>
-    <string name="no_message">No tienes mensajes para hoy</string>
-    <string name="cost">Costo</string>
-    <string name="acumm">Gasto acumulado</string>
+    <string name="message_quantity">%1$s mensajes pendientes de envio</string>
+    <string name="message_quantity_single">%1$s mensaje pendiente de envio</string>
+    <string name="no_message">No tienes mensajes pendientes</string>
+    <string name="cost">Costo mensajes pendientes</string>
+    <string name="acumm">Costo acumulado</string>
+    <string name="total_cost">Costo total</string>
     <string name="addressee">Destinatarios:</string>
     <string name="cancel">Cancelar</string>
     <string name="ok">OK</string>

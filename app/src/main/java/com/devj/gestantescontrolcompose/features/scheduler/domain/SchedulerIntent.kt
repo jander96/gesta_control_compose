@@ -2,11 +2,11 @@ package com.devj.gestantescontrolcompose.features.scheduler.domain
 
 import com.devj.gestantescontrolcompose.common.basemvi.MviAction
 import com.devj.gestantescontrolcompose.common.basemvi.MviIntent
-import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
 sealed class SchedulerIntent: MviIntent{
     object EnterAtPage : SchedulerIntent()
     object MessageSaw : SchedulerIntent()
+    object RequestCost : SchedulerIntent()
     data class OnDeleteButtonClick(val message: Message): SchedulerIntent()
     data class OnDateChanged(val date: String): SchedulerIntent()
     data class OnTimeChanged(val time: String): SchedulerIntent()
@@ -24,6 +24,7 @@ sealed class SchedulerIntent: MviIntent{
             is OnTextChanged -> SchedulerAction.ChangeText(text)
             is OnSendClick -> SchedulerAction.SaveNewSchedule(message)
             MessageSaw -> SchedulerAction.MessageSaw
+            RequestCost -> SchedulerAction.GetCost
         }
     }
 }

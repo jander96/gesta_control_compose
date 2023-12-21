@@ -27,9 +27,9 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     date: String,
     messageQuantity: Int,
-    currentCost: Double,
-    accumulatedCost: Double,
-    totalCost: Double,
+    pendingMessageCost: Float,
+    accumulatedCost: Float,
+    totalCost: Float,
     username: String
 ) {
     Column(modifier = modifier) {
@@ -46,7 +46,7 @@ fun ScheduleHeader(
 
         ScheduleCard(
             messageQuantity = messageQuantity,
-            currentCost = currentCost,
+            pendingMessageCost = pendingMessageCost,
             accumulatedCost = accumulatedCost,
             totalCost = totalCost
         )
@@ -58,14 +58,14 @@ fun ScheduleHeader(
 fun ScheduleCard(
     modifier: Modifier = Modifier,
     messageQuantity: Int,
-    currentCost: Double,
-    accumulatedCost: Double,
-    totalCost: Double,
+    pendingMessageCost: Float,
+    accumulatedCost: Float,
+    totalCost: Float,
     ) {
     Card(modifier = modifier) {
         val title = when(messageQuantity){
             0-> stringResource(R.string.no_message)
-            1-> stringResource(R.string.message_quantity, messageQuantity)
+            1-> stringResource(R.string.message_quantity_single, messageQuantity)
             else -> stringResource(R.string.message_quantity, messageQuantity)
         }
         Column(modifier = Modifier.padding(16.dp)) {
@@ -73,8 +73,9 @@ fun ScheduleCard(
             Spacer4()
             Divider()
             Spacer4()
-            FinanceRow(text = stringResource(R.string.cost), price = currentCost)
+            FinanceRow(text = stringResource(R.string.cost), price = pendingMessageCost)
             FinanceRow(text = stringResource(R.string.acumm), price = accumulatedCost)
+            FinanceRow(text = stringResource(R.string.total_cost), price = totalCost)
         }
     }
 }
@@ -82,7 +83,7 @@ fun ScheduleCard(
 @Composable
 fun FinanceRow(
     text: String,
-    price: Double,
+    price: Float,
     modifier: Modifier = Modifier
 ) {
     Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = modifier.fillMaxWidth()) {

@@ -1,5 +1,6 @@
 package com.devj.gestantescontrolcompose.common.presenter.composables
 
+import android.icu.util.Calendar
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -18,6 +19,7 @@ import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,8 +59,8 @@ fun CalendarPicker(
             dateFormatter = DatePickerFormatter(selectedDateSkeleton = DateTimeHelper.YEAR_MONTH_DAY),
             state = pickerState,
             dateValidator = {milliseconds ->
-                if (isFutureEnabled)milliseconds >= DateTimeHelper.currentTimeInMillis()
-                else DateTimeHelper.currentTimeInMillis() > milliseconds
+                if (isFutureEnabled)milliseconds >= Calendar.getInstance(Locale.getDefault()).timeInMillis
+                else  milliseconds < Calendar.getInstance(Locale.getDefault()).timeInMillis
             }
         )
     }

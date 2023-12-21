@@ -172,7 +172,7 @@ fun Context.writeBitmapToFile(
     }
 }
 
-fun Double.toCurrency(): String{
+fun Float.toCurrency(): String{
     val formatter = NumberFormat.getCurrencyInstance(Locale.US)
     return formatter.format(this)
 }

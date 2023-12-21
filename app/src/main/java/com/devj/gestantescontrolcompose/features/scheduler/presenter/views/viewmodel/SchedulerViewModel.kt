@@ -10,6 +10,7 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerEffec
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.DeleteMessage
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetAllMessage
+import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetSMSCost
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.SaveMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,23 +25,27 @@ class SchedulerViewModel @Inject constructor(
     private val saveMessage: SaveMessage,
     private val deleteMessage: DeleteMessage,
     private val uiMapper: UIMapper,
+    private val getSMSCost: GetSMSCost,
 ) :
     MviBaseViewModel<SchedulerIntent, SchedulerAction, SchedulerEffect, SchedulerViewState>() {
     override val mutableViewState = MutableStateFlow(SchedulerViewState())
         init {
             sendUiEvent(SchedulerIntent.EnterAtPage)
+            sendUiEvent(SchedulerIntent.RequestCost)
         }
+
     override suspend fun process(action: SchedulerAction): SchedulerEffect {
-       return when(action){
+        return when (action) {
             is SchedulerAction.DeleteSchedule -> delete(action.message)
             SchedulerAction.LoadRequiredLists -> load()
             is SchedulerAction.SaveNewSchedule -> save(action.message)
-           is SchedulerAction.ChangeDate -> changeDate(action.date)
-           is SchedulerAction.ChangeTime -> changeTime(action.time)
-           is SchedulerAction.ChangeText -> changeText(action.text)
-           is SchedulerAction.SaveAddressee -> changeAddressee(action.addressee)
-           SchedulerAction.MessageSaw -> SchedulerEffect.EventSaw
-       }
+            is SchedulerAction.ChangeDate -> changeDate(action.date)
+            is SchedulerAction.ChangeTime -> changeTime(action.time)
+            is SchedulerAction.ChangeText -> changeText(action.text)
+            is SchedulerAction.SaveAddressee -> changeAddressee(action.addressee)
+            SchedulerAction.MessageSaw -> SchedulerEffect.EventSaw
+            SchedulerAction.GetCost -> smsCost()
+        }
     }
     private fun load(): SchedulerEffect {
         return getAllMessage().fold(
@@ -68,13 +73,24 @@ class SchedulerViewModel @Inject constructor(
     private suspend fun delete(message: Message):SchedulerEffect{
         return deleteMessage(message).fold(
             onSuccess = {
-                SchedulerEffect.SaveMessage.Success
+                SchedulerEffect.DeleteMessage.Success
             },
             onFailure = {
-                SchedulerEffect.SaveMessage.Error(it)
+                SchedulerEffect.DeleteMessage.Error(it)
             }
         )
     }
+    private fun smsCost():SchedulerEffect{
+        return getSMSCost().fold(
+            onSuccess = {
+                SchedulerEffect.CostOperations.GetSuccess(it)
+            },
+            onFailure = {
+                SchedulerEffect.CostOperations.Error(it)
+            }
+        )
+    }
+
     private fun changeDate(date: String): SchedulerEffect{
         return SchedulerEffect.UpdateField.Date(date)
     }
@@ -145,6 +161,14 @@ class SchedulerViewModel @Inject constructor(
             SchedulerEffect.EventSaw -> oldState.copy(
                 newMessageCreated = false
             )
+
+            is SchedulerEffect.CostOperations.Error -> oldState
+            is SchedulerEffect.CostOperations.GetSuccess ->  oldState.copy(
+                smsCost = result.cost
+            )
+
+            is SchedulerEffect.DeleteMessage.Error -> oldState
+            SchedulerEffect.DeleteMessage.Success -> oldState
         }
     }
 

@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,8 @@ import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 fun AddresseePicker(
     onCancel: () -> Unit,
     onConfirm: (List<PregnantUI>) -> Unit,
-    addressees: List<PregnantUI>
+    addressees: List<PregnantUI>,
+    selected: List<String>?,
 ) {
     var remittersSelected  by remember {
         mutableStateOf<List<PregnantUI>>(listOf<PregnantUI>())
@@ -45,6 +47,10 @@ fun AddresseePicker(
         mutableStateOf(false)
     }
     val height = LocalConfiguration.current.screenHeightDp
+
+    LaunchedEffect(key1 = selected,){
+        selected?.let { remittersSelected = addressees.filter { it.phoneNumber in selected } }
+    }
     Dialog(onDismissRequest = onCancel) {
         Surface(shape = MaterialTheme.shapes.medium) {
             Column(modifier = Modifier.fillMaxWidth()) {

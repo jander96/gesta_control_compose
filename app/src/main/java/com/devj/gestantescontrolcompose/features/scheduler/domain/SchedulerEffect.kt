@@ -12,12 +12,21 @@ sealed class SchedulerEffect: MviResult{
         object Success : SaveMessage()
         data class Error(val error: Throwable): SaveMessage()
     }
+    sealed class DeleteMessage: SchedulerEffect(){
+        object Success : DeleteMessage()
+        data class Error(val error: Throwable): DeleteMessage()
+    }
     sealed class InitialLoad : SchedulerEffect(){
         data class Success(
             val listOfPregnant: Flow<List<Pregnant>>,
             val listOfMessage: Flow<List<Message>>
         ) : InitialLoad()
         data class Error(val error: Throwable): InitialLoad()
+    }
+    sealed class CostOperations: SchedulerEffect(){
+        data class GetSuccess(val cost: Flow<Float>): CostOperations()
+        data class Error(val error: Throwable): CostOperations()
+
     }
     sealed class UpdateField: SchedulerEffect(){
         data class Date(val date: String): UpdateField()

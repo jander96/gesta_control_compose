@@ -60,6 +60,7 @@ fun MessageSchedulePage(
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pregnantList by viewState.pregnantList.collectAsStateWithLifecycle(emptyList())
     val messageList by viewState.messageList.collectAsStateWithLifecycle(emptyList())
+    val smsCost by viewState.smsCost.collectAsStateWithLifecycle(1f)
     val pageState = rememberScheduleState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -113,7 +114,8 @@ fun MessageSchedulePage(
                         pageState.addresseePickerVisibility(false)
                         viewModel.sendUiEvent(SchedulerIntent.OnAddresseePicked(it.map { pregnant -> pregnant.phoneNumber }))
                     },
-                    addressees = pregnantList.filter { it.phoneNumber.isNotEmpty() }
+                    addressees = pregnantList.filter { it.phoneNumber.isNotEmpty() },
+                    selected = pageState.messageToEdit.value?.addressees
                 )
             if (pageState.showDeleteDialog.value) {
                 DeleteDialog(
@@ -155,10 +157,10 @@ fun MessageSchedulePage(
                     end.linkTo(parent.end)
                 },
                 date = pageState.dateNow,
-                messageQuantity = 6,
-                currentCost = 27.0,
-                accumulatedCost = 100.0,
-                totalCost = 127.0,
+                messageQuantity = messageList.filter { !it.isBeforeNow }.size,
+                pendingMessageCost =  messageList.filter { !it.isBeforeNow }.size * smsCost  ,
+                accumulatedCost = messageList.filter { it.isBeforeNow }.size * smsCost ,
+                totalCost = messageList.size * smsCost,
                 username = "Ignacio Jimenez"
             )
             if (messageList.isEmpty()) {

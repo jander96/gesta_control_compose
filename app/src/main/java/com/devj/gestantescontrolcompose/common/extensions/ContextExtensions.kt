@@ -6,15 +6,9 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 
 suspend fun Context.getBitmap(uri: Uri): Bitmap{

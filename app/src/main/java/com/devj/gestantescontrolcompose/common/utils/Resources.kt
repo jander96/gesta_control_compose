@@ -31,10 +31,6 @@ object DateTimeHelper{
         return  outputFormat.format(date)
     }
 
-    fun currentTimeInMillis(): Long{
-        val now = LocalDateTime.now(ZoneOffset.UTC)
-        return now.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
-    }
 
     fun LocalDateTime.toStandardDate(): String {
         val formatter = yearMonthDayFormatter
