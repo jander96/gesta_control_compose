@@ -24,9 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -42,7 +40,6 @@ import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardTi
 import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialog
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
-import com.devj.gestantescontrolcompose.features.scheduler.presenter.framework.work_manager.ScheduledSMS
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.AddresseePicker
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.CreatorMessage
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.MessageItem
@@ -62,8 +59,6 @@ fun MessageSchedulePage(
     val messageList by viewState.messageList.collectAsStateWithLifecycle(emptyList())
     val smsCost by viewState.smsCost.collectAsStateWithLifecycle(1f)
     val pageState = rememberScheduleState()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
 
@@ -149,6 +144,44 @@ fun MessageSchedulePage(
                     viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
                 }
             }
+            LaunchedEffect(key1 = viewState.messageCanceled) {
+                if (viewState.messageCanceled) {
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = "SMS eliminado correctamente",
+                        actionLabel = "Ok",
+                        duration = SnackbarDuration.Short
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
+                            viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                        }
+
+                        SnackbarResult.Dismissed -> {}
+                    }
+
+                    viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                }
+            }
+            LaunchedEffect(key1 = viewState.error) {
+                if (viewState.error != null) {
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = "ERROR ${viewState.error!!.message}",
+                        actionLabel = "Ok",
+                        duration = SnackbarDuration.Indefinite
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
+                            viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                        }
+
+                        SnackbarResult.Dismissed -> {}
+                    }
+
+                    viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                }
+            }
 
             ScheduleHeader(
                 modifier = Modifier.constrainAs(header) {
@@ -222,6 +255,7 @@ fun MessageSchedulePage(
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
                     },
+                message = pageState.messageToEdit.value,
                 textMessage = viewState.text ?: "",
                 date = viewState.date,
                 time = viewState.time,
@@ -237,27 +271,40 @@ fun MessageSchedulePage(
 //                    openBatterySettings(context)
 
                     //trabajo asyncrono
-                    if (it == 0) {
-
+                    if (it.isEmpty()) {
+                        val dateTime = "${viewState.date} ${viewState.time}"
                         val messageScheduled = Message(
+                            id = "${UUID.randomUUID()}_$dateTime",
                             message = viewState.text ?: "",
-                            dateTime = "${viewState.date} ${viewState.time}",
+                            dateTime = dateTime,
                             tag = "${UUID.randomUUID()}",
                             addressees = viewState.addressee
                         )
-                        scheduleMessage(context, messageScheduled)
 
                         viewModel.sendUiEvent(SchedulerIntent.OnSendClick(messageScheduled))
 
                     } else {
-                        //Actualizar el mensaje
+                        val dateTime = "${viewState.date} ${viewState.time}"
+                        val messageScheduled = Message(
+                            id = it,
+                            message = viewState.text ?: "",
+                            dateTime = dateTime,
+                            tag = "${UUID.randomUUID()}",
+                            addressees = viewState.addressee
+                        )
+
+                        viewModel.sendUiEvent(SchedulerIntent.OnSendClick(messageScheduled))
                     }
                     pageState.scope.launch {
                         pageState.scaffoldState.bottomSheetState.hide()
                     }
 
                 },
-                isValidMessage = viewState.isValidMessage
+                isValidMessage = viewState.isValidMessage,
+                onCleanClick = {
+                    pageState.setMessageToEdit(null)
+                    viewModel.sendUiEvent(SchedulerIntent.OnCleanClick)
+                }
             )
 
         }
@@ -265,12 +312,6 @@ fun MessageSchedulePage(
 
 }
 
-private fun scheduleMessage(context: Context, message: Message): ScheduledSMS {
-    return ScheduledSMS(
-        context = context,
-        message = message,
-    )
-}
 
 @Preview
 @Composable

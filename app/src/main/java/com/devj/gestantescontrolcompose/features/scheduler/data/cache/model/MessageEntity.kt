@@ -7,8 +7,8 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 
 @Entity(tableName = "messages_table")
 data class MessageEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val id: String,
     val message: String,
     @ColumnInfo(name = "date_time")
     val dateTime: String,

@@ -85,11 +85,6 @@ fun CircularIndicator(
         animationSpec = tween(1000)
         )
 
-//    val receivedValue by animateFloatAsState(
-//        targetValue = allowedIndicatorValue,
-//        animationSpec = tween(1000),
-//        label = "valueAnimation"
-//    )
 
     val animatedTextColor by animateColorAsState(
         targetValue = if (allowedIndicatorValue == 0f) MaterialTheme.colorScheme.onSurface.copy(

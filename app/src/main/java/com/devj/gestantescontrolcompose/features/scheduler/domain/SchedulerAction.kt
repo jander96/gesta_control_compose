@@ -6,6 +6,7 @@ sealed class SchedulerAction: MviAction{
     object LoadRequiredLists  : SchedulerAction()
     object MessageSaw  : SchedulerAction()
     object GetCost  : SchedulerAction()
+    object CleanFields  : SchedulerAction()
     data class SaveNewSchedule(val message: Message): SchedulerAction()
     data class DeleteSchedule(val message: Message): SchedulerAction()
     data class ChangeDate(val date: String): SchedulerAction()

@@ -8,10 +8,10 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerAction
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerEffect
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
-import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.DeleteMessage
+import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.CancelScheduledSMS
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetAllMessage
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetSMSCost
-import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.SaveMessage
+import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.ScheduleMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
@@ -22,8 +22,8 @@ import javax.inject.Inject
 class SchedulerViewModel @Inject constructor(
     private val getAllPregnant: GetAllPregnant,
     private val getAllMessage: GetAllMessage,
-    private val saveMessage: SaveMessage,
-    private val deleteMessage: DeleteMessage,
+    private val schedule: ScheduleMessage,
+    private val cancelScheduledSMS: CancelScheduledSMS,
     private val uiMapper: UIMapper,
     private val getSMSCost: GetSMSCost,
 ) :
@@ -45,6 +45,7 @@ class SchedulerViewModel @Inject constructor(
             is SchedulerAction.SaveAddressee -> changeAddressee(action.addressee)
             SchedulerAction.MessageSaw -> SchedulerEffect.EventSaw
             SchedulerAction.GetCost -> smsCost()
+            SchedulerAction.CleanFields -> SchedulerEffect.Clean
         }
     }
     private fun load(): SchedulerEffect {
@@ -61,22 +62,23 @@ class SchedulerViewModel @Inject constructor(
     }
 
     private suspend fun save(message: Message):SchedulerEffect{
-        return saveMessage(message).fold(
+        return schedule(message).fold(
             onSuccess = {
-                SchedulerEffect.SaveMessage.Success
+                SchedulerEffect.ScheduleMessage.Success
             },
             onFailure = {
-                SchedulerEffect.SaveMessage.Error(it)
+                SchedulerEffect.ScheduleMessage.Error(it)
             }
         )
     }
+
     private suspend fun delete(message: Message):SchedulerEffect{
-        return deleteMessage(message).fold(
+        return cancelScheduledSMS(message).fold(
             onSuccess = {
-                SchedulerEffect.DeleteMessage.Success
+                SchedulerEffect.CancelMessage.Success
             },
             onFailure = {
-                SchedulerEffect.DeleteMessage.Error(it)
+                SchedulerEffect.CancelMessage.Error(it)
             }
         )
     }
@@ -146,12 +148,13 @@ class SchedulerViewModel @Inject constructor(
                 isValidMessage = validate(oldState.copy(addressee = result.addressee))
             )
 
-            is SchedulerEffect.SaveMessage.Error ->  oldState.copy(
+            is SchedulerEffect.ScheduleMessage.Error ->  oldState.copy(
                 isLoading = false,
                 error = result.error,
             )
-            SchedulerEffect.SaveMessage.Success -> oldState.copy(
+            SchedulerEffect.ScheduleMessage.Success -> oldState.copy(
                newMessageCreated = true,
+                isValidMessage = false,
                 text = null,
                 date = null,
                 time = null,
@@ -159,7 +162,8 @@ class SchedulerViewModel @Inject constructor(
             )
 
             SchedulerEffect.EventSaw -> oldState.copy(
-                newMessageCreated = false
+                newMessageCreated = false,
+                messageCanceled = false,
             )
 
             is SchedulerEffect.CostOperations.Error -> oldState
@@ -167,8 +171,23 @@ class SchedulerViewModel @Inject constructor(
                 smsCost = result.cost
             )
 
-            is SchedulerEffect.DeleteMessage.Error -> oldState
-            SchedulerEffect.DeleteMessage.Success -> oldState
+            is SchedulerEffect.CancelMessage.Error -> oldState.copy(
+                messageCanceled = false,
+                error = result.error
+            )
+            SchedulerEffect.CancelMessage.Success -> oldState.copy(
+                messageCanceled = true
+            )
+
+            SchedulerEffect.Clean -> oldState.copy(
+                addressee = emptyList(),
+                text = "",
+                date = "",
+                time = "",
+                messageList = flow { emptyList<String>() },
+                isValidMessage = false,
+
+            )
         }
     }
 

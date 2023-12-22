@@ -1,8 +1,10 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
@@ -13,6 +15,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,8 +35,9 @@ fun CreatorMessage(
     onMessageChange: (String) -> Unit,
     onCalendarClick: () -> Unit,
     onClockClick: () -> Unit,
+    onCleanClick: () -> Unit,
     onAddresseeClick: () -> Unit,
-    onSendClick: (Int) -> Unit,
+    onSendClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     message: Message? = null,
     date: String? = null,
@@ -37,20 +45,29 @@ fun CreatorMessage(
     remitters: Int? = null,
     isValidMessage: Boolean = false,
 ) {
+    var text by rememberSaveable {
+        mutableStateOf("")
+    }
+    LaunchedEffect(key1 = message?.message){
+        message?.message?.let {
+            text = it
+        }
+    }
+    text = textMessage
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 placeholder = {
                     Text(text = "mensaje", style = MaterialTheme.typography.bodyMedium)
                 },
-                value = message?.message ?: textMessage,
+                value = text,
                 shape = MaterialTheme.shapes.small.copy(CornerSize(30.dp)),
                 onValueChange = onMessageChange,
                 modifier = Modifier.weight(3f),
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            val id = message?.id ?: 0
+                            val id = message?.id ?: ""
                             onSendClick(id)
                         },
                         enabled = isValidMessage,
@@ -66,32 +83,47 @@ fun CreatorMessage(
             )
 
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                ) {
+                IconButton(onClick = onCalendarClick) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.ic_schedule_message_svg),
+                        contentDescription = "",
+                    )
+                }
 
-            IconButton(onClick = onCalendarClick) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_schedule_message_svg),
-                    contentDescription = "",
-                )
+                Spacer4()
+                IconButton(onClick = onClockClick) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.ic_clock_seven_svg),
+                        contentDescription = "",
+                    )
+                }
+
+                Spacer4()
+                IconButton(onClick = onAddresseeClick) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.ic_contacts_svg),
+                        contentDescription = "",
+                    )
+                }
             }
 
-            Spacer4()
-            IconButton(onClick = onClockClick) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_clock_seven_svg),
-                    contentDescription = "",
-                )
-            }
 
-            Spacer4()
-            IconButton(onClick = onAddresseeClick) {
+            IconButton(onClick = onCleanClick) {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_contacts_svg),
-                    contentDescription = "",
-                )
+                    painter = painterResource(id = R.drawable.ic_cleaner_svg),
+                    contentDescription = "clean_all" )
             }
 
         }
@@ -134,7 +166,8 @@ fun CreatorMessagePreview() {
         onCalendarClick = {},
         onClockClick = {},
         onAddresseeClick = {},
-        onSendClick = {}
+        onSendClick = {},
+        onCleanClick = {}
     )
 }
 

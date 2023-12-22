@@ -1,4 +1,4 @@
-package com.devj.gestantescontrolcompose.features.scheduler.presenter.framework.work_manager
+package com.devj.gestantescontrolcompose.common.service.work_manager
 
 import android.content.Context
 import androidx.work.Worker

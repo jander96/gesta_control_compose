@@ -1,7 +1,6 @@
 package com.devj.gestantescontrolcompose.common.utils
 
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -13,7 +12,7 @@ object DateTimeHelper{
     const val DAY_OF_WEEK_MONTH = "EEEE dd 'de' MMMM"
     const val DAY_OF_MONTH_HOUR_MINUTES_am = "dd 'de' MMMM h:mm a"
     const val DAY_OF_MONTH_OF_YEAR = "dd 'de' MMMM 'de' yyyy"
-    const val FULL_DATE_TIME_am = "yyyy-MM-dd HH:mm a"
+    const val FULL_DATE_TIME_am = "yyyy-MM-dd hh:mm a"
 
 
     val yearMonthDayFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)

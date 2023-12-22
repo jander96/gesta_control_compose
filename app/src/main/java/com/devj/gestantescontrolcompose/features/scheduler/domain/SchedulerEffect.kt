@@ -7,14 +7,15 @@ import kotlinx.coroutines.flow.Flow
 sealed class SchedulerEffect: MviResult{
 
     object EventSaw: SchedulerEffect()
+    object Clean: SchedulerEffect()
 
-    sealed class SaveMessage: SchedulerEffect(){
-        object Success : SaveMessage()
-        data class Error(val error: Throwable): SaveMessage()
+    sealed class ScheduleMessage: SchedulerEffect(){
+        object Success : ScheduleMessage()
+        data class Error(val error: Throwable): ScheduleMessage()
     }
-    sealed class DeleteMessage: SchedulerEffect(){
-        object Success : DeleteMessage()
-        data class Error(val error: Throwable): DeleteMessage()
+    sealed class CancelMessage: SchedulerEffect(){
+        object Success : CancelMessage()
+        data class Error(val error: Throwable): CancelMessage()
     }
     sealed class InitialLoad : SchedulerEffect(){
         data class Success(

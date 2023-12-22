@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 
 data class Message(
-    val id: Int = 0,
+    val id: String,
     val message: String,
     val dateTime: String,
     val tag: String,

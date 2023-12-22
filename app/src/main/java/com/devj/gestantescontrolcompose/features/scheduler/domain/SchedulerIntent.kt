@@ -7,6 +7,7 @@ sealed class SchedulerIntent: MviIntent{
     object EnterAtPage : SchedulerIntent()
     object MessageSaw : SchedulerIntent()
     object RequestCost : SchedulerIntent()
+    object OnCleanClick : SchedulerIntent()
     data class OnDeleteButtonClick(val message: Message): SchedulerIntent()
     data class OnDateChanged(val date: String): SchedulerIntent()
     data class OnTimeChanged(val time: String): SchedulerIntent()
@@ -25,6 +26,7 @@ sealed class SchedulerIntent: MviIntent{
             is OnSendClick -> SchedulerAction.SaveNewSchedule(message)
             MessageSaw -> SchedulerAction.MessageSaw
             RequestCost -> SchedulerAction.GetCost
+            OnCleanClick -> SchedulerAction.CleanFields
         }
     }
 }

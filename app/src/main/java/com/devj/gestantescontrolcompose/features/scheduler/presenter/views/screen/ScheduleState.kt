@@ -48,7 +48,7 @@ class ScheduleState (
         messageToDelete.value = message
     }
 
-    fun setMessageToEdit(message: Message){
+    fun setMessageToEdit(message: Message?){
         messageToEdit.value = message
     }
 

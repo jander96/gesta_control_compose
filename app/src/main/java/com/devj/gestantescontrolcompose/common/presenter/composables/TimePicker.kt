@@ -46,7 +46,7 @@ fun AppTimePicker(
     val timeState = rememberTimePickerState()
     val configuration = LocalConfiguration.current
     val showingPicker = remember { mutableStateOf(true) }
-    val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
+    val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
     TimePickerDialog(
         onCancel = onCancel,
         onConfirm = {
