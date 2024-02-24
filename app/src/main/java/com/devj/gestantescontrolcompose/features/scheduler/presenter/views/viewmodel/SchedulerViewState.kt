@@ -18,5 +18,4 @@ data class SchedulerViewState(
     val isValidMessage: Boolean = false,
     val newMessageCreated: Boolean = false,
     val messageCanceled: Boolean = false,
-    val smsCost: Flow<Float> = flowOf(0f)
 ): MviViewState

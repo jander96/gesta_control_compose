@@ -10,7 +10,6 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerEffec
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.CancelScheduledSMS
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetAllMessage
-import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.GetSMSCost
 import com.devj.gestantescontrolcompose.features.scheduler.domain.use_case.ScheduleMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,13 +24,11 @@ class SchedulerViewModel @Inject constructor(
     private val schedule: ScheduleMessage,
     private val cancelScheduledSMS: CancelScheduledSMS,
     private val uiMapper: UIMapper,
-    private val getSMSCost: GetSMSCost,
 ) :
     MviBaseViewModel<SchedulerIntent, SchedulerAction, SchedulerEffect, SchedulerViewState>() {
     override val mutableViewState = MutableStateFlow(SchedulerViewState())
         init {
             sendUiEvent(SchedulerIntent.EnterAtPage)
-            sendUiEvent(SchedulerIntent.RequestCost)
         }
 
     override suspend fun process(action: SchedulerAction): SchedulerEffect {
@@ -44,7 +41,6 @@ class SchedulerViewModel @Inject constructor(
             is SchedulerAction.ChangeText -> changeText(action.text)
             is SchedulerAction.SaveAddressee -> changeAddressee(action.addressee)
             SchedulerAction.MessageSaw -> SchedulerEffect.EventSaw
-            SchedulerAction.GetCost -> smsCost()
             SchedulerAction.CleanFields -> SchedulerEffect.Clean
         }
     }
@@ -79,16 +75,6 @@ class SchedulerViewModel @Inject constructor(
             },
             onFailure = {
                 SchedulerEffect.CancelMessage.Error(it)
-            }
-        )
-    }
-    private fun smsCost():SchedulerEffect{
-        return getSMSCost().fold(
-            onSuccess = {
-                SchedulerEffect.CostOperations.GetSuccess(it)
-            },
-            onFailure = {
-                SchedulerEffect.CostOperations.Error(it)
             }
         )
     }
@@ -166,11 +152,6 @@ class SchedulerViewModel @Inject constructor(
                 messageCanceled = false,
             )
 
-            is SchedulerEffect.CostOperations.Error -> oldState
-            is SchedulerEffect.CostOperations.GetSuccess ->  oldState.copy(
-                smsCost = result.cost
-            )
-
             is SchedulerEffect.CancelMessage.Error -> oldState.copy(
                 messageCanceled = false,
                 error = result.error
@@ -184,7 +165,6 @@ class SchedulerViewModel @Inject constructor(
                 text = "",
                 date = "",
                 time = "",
-                messageList = flow { emptyList<String>() },
                 isValidMessage = false,
 
             )

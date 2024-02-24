@@ -10,30 +10,29 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.presenter.composables.AppTimePicker
 import com.devj.gestantescontrolcompose.common.presenter.composables.CalendarPicker
+import com.devj.gestantescontrolcompose.common.presenter.composables.InfiniteLottieAnimation
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardTime
@@ -52,14 +51,13 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageSchedulePage(
-    viewModel: SchedulerViewModel = hiltViewModel()
+    viewModel: SchedulerViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState,
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pregnantList by viewState.pregnantList.collectAsStateWithLifecycle(emptyList())
     val messageList by viewState.messageList.collectAsStateWithLifecycle(emptyList())
-    val smsCost by viewState.smsCost.collectAsStateWithLifecycle(1f)
     val pageState = rememberScheduleState()
-    val snackbarHostState = remember { SnackbarHostState() }
 
 
     val smsPermission =
@@ -69,17 +67,13 @@ fun MessageSchedulePage(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize(),
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-
-        ) { paddingValues ->
+            .fillMaxSize()
+            .padding(16.dp),
+    ) { paddingValues ->
 
         ConstraintLayout(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(start = 16.dp, end = 16.dp, bottom = 40.dp)
                 .fillMaxSize()
         ) {
             val (header, list, message) = createRefs()
@@ -124,7 +118,6 @@ fun MessageSchedulePage(
                     }, onDismiss = { pageState.deleteDialogVisibility(false) }
                 )
             }
-
             LaunchedEffect(key1 = viewState.newMessageCreated) {
                 if (viewState.newMessageCreated) {
 
@@ -140,7 +133,6 @@ fun MessageSchedulePage(
 
                         SnackbarResult.Dismissed -> {}
                     }
-
                     viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
                 }
             }
@@ -184,16 +176,15 @@ fun MessageSchedulePage(
             }
 
             ScheduleHeader(
-                modifier = Modifier.constrainAs(header) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(header) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
                 date = pageState.dateNow,
                 messageQuantity = messageList.filter { !it.isBeforeNow }.size,
-                pendingMessageCost =  messageList.filter { !it.isBeforeNow }.size * smsCost  ,
-                accumulatedCost = messageList.filter { it.isBeforeNow }.size * smsCost ,
-                totalCost = messageList.size * smsCost,
                 username = "Ignacio Jimenez"
             )
             if (messageList.isEmpty()) {
@@ -204,7 +195,7 @@ fun MessageSchedulePage(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }) {
-                    Text(text = "LLena esto hombre")
+                    InfiniteLottieAnimation(rawRes = R.raw.no_message_animation)
                 }
 
             } else {
@@ -248,7 +239,6 @@ fun MessageSchedulePage(
 
             CreatorMessage(
                 modifier = Modifier
-                    .padding(16.dp)
                     .constrainAs(message) {
                         top.linkTo(list.bottom)
                         start.linkTo(parent.start)
@@ -310,13 +300,6 @@ fun MessageSchedulePage(
         }
     }
 
-}
-
-
-@Preview
-@Composable
-fun SchedulerPagePreview() {
-//    MessageSchedulePage()
 }
 
 fun openBatterySettings(context: Context) {

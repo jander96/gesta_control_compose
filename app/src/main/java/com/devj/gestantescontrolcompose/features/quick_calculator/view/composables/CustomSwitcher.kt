@@ -48,17 +48,17 @@ fun CustomSwitcher(
     onClick: () -> Unit
 ) {
     val offset by animateDpAsState(
-        targetValue = if (isOn) 0.dp else size - padding,
+        targetValue = if (isOn) 0.dp else size * 1.35f,
         animationSpec = animationSpec,
         label = ""
     )
 
     Box(modifier = modifier
-        .width(size * 2f)
+        .width(size * 2.5f)
         .height(size)
         .clip(shape = parentShape)
         .clickable { onClick() }
-        .background(MaterialTheme.colorScheme.secondaryContainer)
+        .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         SwitchButton(
             size,
@@ -87,7 +87,7 @@ fun CustomSwitcher(
                     onText,
                     modifier = Modifier.padding(padding),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isOn) MaterialTheme.colorScheme.secondaryContainer
+                    color = if (isOn) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.primary
                 )
 
@@ -97,7 +97,7 @@ fun CustomSwitcher(
                     modifier = Modifier.padding(padding),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isOn) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.secondaryContainer
+                    else MaterialTheme.colorScheme.onPrimary
                 )
 
         }

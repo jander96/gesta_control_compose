@@ -6,7 +6,6 @@ import com.devj.gestantescontrolcompose.common.basemvi.MviIntent
 sealed class SchedulerIntent: MviIntent{
     object EnterAtPage : SchedulerIntent()
     object MessageSaw : SchedulerIntent()
-    object RequestCost : SchedulerIntent()
     object OnCleanClick : SchedulerIntent()
     data class OnDeleteButtonClick(val message: Message): SchedulerIntent()
     data class OnDateChanged(val date: String): SchedulerIntent()
@@ -25,7 +24,6 @@ sealed class SchedulerIntent: MviIntent{
             is OnTextChanged -> SchedulerAction.ChangeText(text)
             is OnSendClick -> SchedulerAction.SaveNewSchedule(message)
             MessageSaw -> SchedulerAction.MessageSaw
-            RequestCost -> SchedulerAction.GetCost
             OnCleanClick -> SchedulerAction.CleanFields
         }
     }

@@ -66,7 +66,6 @@ fun CalculatorPage(
         ) {
             val (graph, switcher, card, fpp) = createRefs()
             val topGuide = createGuidelineFromTop(0.05f)
-            val bottomGuide = createGuidelineFromBottom(0.20f)
 
 
             CalculatorSwitcher(
@@ -107,7 +106,7 @@ fun CalculatorPage(
                         top.linkTo(switcher.bottom)
                         start.linkTo(parent.start, margin = 32.dp)
                         end.linkTo(parent.end, margin = 32.dp)
-                        bottom.linkTo(bottomGuide)
+                        bottom.linkTo(parent.bottom)
                     },
                 fumDate = viewState.fumDate,
                 onCalculateFumClick = {

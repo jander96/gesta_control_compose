@@ -29,7 +29,7 @@
     <string name="calculate">Calcular</string>
     <string name="fum">FUM</string>
     <string name="usg">USG</string>
-    <string name="us_calculator_subtitle">Ingrese la E.G que tenía cuando se realizó el u/s genético del bebé</string>
+    <string name="us_calculator_subtitle">Ingrese la E.G que tenía cuando se realizó el U/S genético</string>
     <string name="confirm">Confirmar</string>
     <string name="required">requerido</string>
     <string name="invalid">inválido</string>
@@ -48,4 +48,6 @@
     <string name="ok">OK</string>
     <string name="pick_time">Seleccionar hora</string>
     <string name="all">Todas</string>
+    <string name="no_pregnant">No tienes gestantes en seguimiento</string>
+    <string name="add_pregnant">Añada alguna</string>
 </resources>
