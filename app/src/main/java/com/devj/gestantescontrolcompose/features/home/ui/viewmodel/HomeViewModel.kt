@@ -7,8 +7,6 @@ import com.devj.gestantescontrolcompose.common.presenter.model.UIMapper
 import com.devj.gestantescontrolcompose.features.home.domain.HomeAction
 import com.devj.gestantescontrolcompose.features.home.domain.HomeEffect
 import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
-import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
-import com.devj.gestantescontrolcompose.features.home.domain.use_case.FilterList
 import com.devj.gestantescontrolcompose.features.home.domain.use_case.SearchByName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +21,7 @@ class HomeViewModel @Inject constructor(
     private val deletePregnant: DeletePregnantById,
     private val uiMapper: UIMapper,
     private val search: SearchByName,
-    private val filterList: FilterList,
-
-) : MviBaseViewModel<HomeIntent,HomeAction,HomeEffect, HomeViewState>() {
+    ) : MviBaseViewModel<HomeIntent,HomeAction,HomeEffect, HomeViewState>() {
 
 
     override val mutableViewState = MutableStateFlow(HomeViewState())
@@ -36,14 +32,13 @@ class HomeViewModel @Inject constructor(
 
      override suspend fun process(action: HomeAction): HomeEffect {
         return when (action) {
-            HomeAction.LoadListPregnant -> load()
+            HomeAction.LoadRequirements -> load()
             is HomeAction.DeletePregnant -> delete(action.id)
             is HomeAction.Search -> searchByFullName(action.query)
-            is HomeAction.Filter -> applyFilter(action.filter)
         }
     }
 
-    private fun load():HomeEffect{
+    private suspend fun load(): HomeEffect {
         return getAllPregnant().fold(
             onSuccess = {result->
                 HomeEffect.PregnantListUpdate.Success(result)
@@ -64,17 +59,6 @@ class HomeViewModel @Inject constructor(
         return search(query).fold(
             onSuccess = { result ->
                 HomeEffect.PregnantListUpdate.SearchResult(result)
-            },
-            onFailure = { error -> HomeEffect.PregnantListUpdate.Error(error) }
-        )
-    }
-
-    private fun applyFilter(filter: FilterType?): HomeEffect {
-        return filterList(filter).fold(
-            onSuccess = { result ->
-                HomeEffect.PregnantListUpdate.ApplyFilter(
-                    result.first, result.second
-                )
             },
             onFailure = { error -> HomeEffect.PregnantListUpdate.Error(error) }
         )
@@ -137,17 +121,6 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            is HomeEffect.PregnantListUpdate.ApplyFilter -> {
-                oldState.copy(
-                    error = null,
-                    isLoading = false,
-                    pregnantList = result.listOfPregnant.map { pregnantList ->
-                        pregnantList.map { uiMapper.fromDomain(it) }
-                    },
-                    isDataBaseEmpty = false,
-                    activeFilter = result.filter
-                )
-            }
         }
     }
 }

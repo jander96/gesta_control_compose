@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
-import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 import com.devj.gestantescontrolcompose.common.extensions.Spacer8
 import com.devj.gestantescontrolcompose.common.extensions.toCurrency
 import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
@@ -27,13 +25,10 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     date: String,
     messageQuantity: Int,
-    pendingMessageCost: Float,
-    accumulatedCost: Float,
-    totalCost: Float,
     username: String
 ) {
     Column(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             UriImage(imageUri = null, placeholder = R.drawable.woman_avatar, size = 40.dp )
             Spacer8()
             Column {
@@ -45,10 +40,8 @@ fun ScheduleHeader(
         Spacer16()
 
         ScheduleCard(
+            modifier = Modifier.fillMaxWidth(),
             messageQuantity = messageQuantity,
-            pendingMessageCost = pendingMessageCost,
-            accumulatedCost = accumulatedCost,
-            totalCost = totalCost
         )
     }
 
@@ -58,9 +51,6 @@ fun ScheduleHeader(
 fun ScheduleCard(
     modifier: Modifier = Modifier,
     messageQuantity: Int,
-    pendingMessageCost: Float,
-    accumulatedCost: Float,
-    totalCost: Float,
     ) {
     Card(modifier = modifier) {
         val title = when(messageQuantity){
@@ -70,12 +60,6 @@ fun ScheduleCard(
         }
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text =title, style = MaterialTheme.typography.titleMedium)
-            Spacer4()
-            Divider()
-            Spacer4()
-            FinanceRow(text = stringResource(R.string.cost), price = pendingMessageCost)
-            FinanceRow(text = stringResource(R.string.acumm), price = accumulatedCost)
-            FinanceRow(text = stringResource(R.string.total_cost), price = totalCost)
         }
     }
 }

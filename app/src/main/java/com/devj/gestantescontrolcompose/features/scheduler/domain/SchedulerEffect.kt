@@ -24,11 +24,6 @@ sealed class SchedulerEffect: MviResult{
         ) : InitialLoad()
         data class Error(val error: Throwable): InitialLoad()
     }
-    sealed class CostOperations: SchedulerEffect(){
-        data class GetSuccess(val cost: Flow<Float>): CostOperations()
-        data class Error(val error: Throwable): CostOperations()
-
-    }
     sealed class UpdateField: SchedulerEffect(){
         data class Date(val date: String): UpdateField()
         data class Time(val time: String): UpdateField()

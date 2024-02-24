@@ -1,7 +1,6 @@
 package com.devj.gestantescontrolcompose.features.home.domain
 
 import com.devj.gestantescontrolcompose.common.basemvi.MviIntent
-import com.devj.gestantescontrolcompose.features.home.domain.model.FilterType
 
 
 sealed class HomeIntent: MviIntent{
@@ -10,14 +9,12 @@ sealed class HomeIntent: MviIntent{
 
     data class OnSearch(val query: String) : HomeIntent()
 
-    data class OnFilterClick(val filter: FilterType?): HomeIntent()
 
     override fun mapToAction(): HomeAction {
         return when(this){
-            HomeIntent.EnterAtHome -> HomeAction.LoadListPregnant
+            HomeIntent.EnterAtHome -> HomeAction.LoadRequirements
             is HomeIntent.OnDeletePressed -> HomeAction.DeletePregnant(pregnantId)
             is HomeIntent.OnSearch -> HomeAction.Search(query)
-            is HomeIntent.OnFilterClick -> HomeAction.Filter(filter)
         }
     }
 
