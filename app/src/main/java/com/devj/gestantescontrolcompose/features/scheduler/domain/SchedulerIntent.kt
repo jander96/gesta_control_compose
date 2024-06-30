@@ -7,6 +7,7 @@ sealed class SchedulerIntent: MviIntent{
     object EnterAtPage : SchedulerIntent()
     object MessageSaw : SchedulerIntent()
     object OnCleanClick : SchedulerIntent()
+    object CheckPowerSetup : SchedulerIntent()
     data class OnDeleteButtonClick(val message: Message): SchedulerIntent()
     data class OnDateChanged(val date: String): SchedulerIntent()
     data class OnTimeChanged(val time: String): SchedulerIntent()
@@ -17,6 +18,7 @@ sealed class SchedulerIntent: MviIntent{
     override fun mapToAction(): MviAction {
         return when (this) {
             EnterAtPage -> SchedulerAction.LoadRequiredLists
+            CheckPowerSetup -> SchedulerAction.CheckPowerManagerService
             is OnDeleteButtonClick -> SchedulerAction.DeleteSchedule(message)
             is OnDateChanged -> SchedulerAction.ChangeDate(date)
             is OnTimeChanged -> SchedulerAction.ChangeTime(time)

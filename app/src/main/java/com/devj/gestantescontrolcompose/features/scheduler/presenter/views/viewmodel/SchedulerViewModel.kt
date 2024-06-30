@@ -1,9 +1,11 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.viewmodel
 
+import android.os.PowerManager
 import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
 import com.devj.gestantescontrolcompose.common.domain.usescases.GetAllPregnant
 import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.common.presenter.model.UIMapper
+import com.devj.gestantescontrolcompose.features.scheduler.data.PowerManagerService
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerAction
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerEffect
@@ -24,15 +26,18 @@ class SchedulerViewModel @Inject constructor(
     private val schedule: ScheduleMessage,
     private val cancelScheduledSMS: CancelScheduledSMS,
     private val uiMapper: UIMapper,
+    private val powerManager: PowerManagerService
 ) :
     MviBaseViewModel<SchedulerIntent, SchedulerAction, SchedulerEffect, SchedulerViewState>() {
     override val mutableViewState = MutableStateFlow(SchedulerViewState())
         init {
             sendUiEvent(SchedulerIntent.EnterAtPage)
+            sendUiEvent(SchedulerIntent.CheckPowerSetup)
         }
 
     override suspend fun process(action: SchedulerAction): SchedulerEffect {
         return when (action) {
+            is SchedulerAction.CheckPowerManagerService -> checkBatteryOptimizations()
             is SchedulerAction.DeleteSchedule -> delete(action.message)
             SchedulerAction.LoadRequiredLists -> load()
             is SchedulerAction.SaveNewSchedule -> save(action.message)
@@ -77,6 +82,14 @@ class SchedulerViewModel @Inject constructor(
                 SchedulerEffect.CancelMessage.Error(it)
             }
         )
+    }
+
+    private fun checkBatteryOptimizations():SchedulerEffect{
+        return if(powerManager.isIgnoringBatteryOptimizations()){
+            SchedulerEffect.BatteryOptimization.Disabled
+        }else{
+            SchedulerEffect.BatteryOptimization.Enabled
+        }
     }
 
     private fun changeDate(date: String): SchedulerEffect{
@@ -167,6 +180,13 @@ class SchedulerViewModel @Inject constructor(
                 time = "",
                 isValidMessage = false,
 
+            )
+
+            SchedulerEffect.BatteryOptimization.Disabled -> oldState.copy(
+                showBatteryAlert = false
+            )
+            SchedulerEffect.BatteryOptimization.Enabled -> oldState.copy(
+                showBatteryAlert = true
             )
         }
     }

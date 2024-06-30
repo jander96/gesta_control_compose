@@ -30,4 +30,10 @@ sealed class SchedulerEffect: MviResult{
         data class Text(val text: String): UpdateField()
     }
     data class UpdatedAddressed(val addressee: List<String>): SchedulerEffect()
+
+
+    sealed class BatteryOptimization: SchedulerEffect(){
+        object Enabled : BatteryOptimization()
+        object Disabled : BatteryOptimization()
+    }
 }

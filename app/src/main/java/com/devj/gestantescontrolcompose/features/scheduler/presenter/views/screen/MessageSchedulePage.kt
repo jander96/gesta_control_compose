@@ -3,10 +3,13 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.screen
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +25,13 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.ContextCompat.startActivity
@@ -40,6 +48,7 @@ import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialo
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.AddresseePicker
+import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.BatteryDialog
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.CreatorMessage
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.MessageItem
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.ScheduleHeader
@@ -58,12 +67,16 @@ fun MessageSchedulePage(
     val pregnantList by viewState.pregnantList.collectAsStateWithLifecycle(emptyList())
     val messageList by viewState.messageList.collectAsStateWithLifecycle(emptyList())
     val pageState = rememberScheduleState()
+    val showDialogBattery = viewState.showBatteryAlert
 
 
     val smsPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
 
         }
+    val batteryIntent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
+        viewModel.sendUiEvent(SchedulerIntent.CheckPowerSetup)
+    }
 
     Scaffold(
         modifier = Modifier
@@ -173,6 +186,13 @@ fun MessageSchedulePage(
 
                     viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
                 }
+            }
+
+            if(showDialogBattery){
+                BatteryDialog(onConfirm = {
+                    openBatterySettings(batteryIntent)
+                },
+                    onDismissRequest = {})
             }
 
             ScheduleHeader(
@@ -302,8 +322,8 @@ fun MessageSchedulePage(
 
 }
 
-fun openBatterySettings(context: Context) {
+fun openBatterySettings(activityResult: ManagedActivityResultLauncher<Intent, ActivityResult>) {
     val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    startActivity(context, intent, null)
+    activityResult.launch(intent)
+
 }

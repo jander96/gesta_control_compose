@@ -50,4 +50,5 @@
     <string name="all">Todas</string>
     <string name="no_pregnant">No tienes gestantes en seguimiento</string>
     <string name="add_pregnant">Añada alguna</string>
+    <string name="battery_optimization_msg">Para que la app envie los mensajes aun y cuando este cerrada. Por favor deshabilite la optimizacion de bateria para esta app</string>
 </resources>

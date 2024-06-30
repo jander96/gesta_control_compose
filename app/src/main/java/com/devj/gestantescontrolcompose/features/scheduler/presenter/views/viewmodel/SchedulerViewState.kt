@@ -18,4 +18,5 @@ data class SchedulerViewState(
     val isValidMessage: Boolean = false,
     val newMessageCreated: Boolean = false,
     val messageCanceled: Boolean = false,
+    val showBatteryAlert: Boolean = false,
 ): MviViewState
