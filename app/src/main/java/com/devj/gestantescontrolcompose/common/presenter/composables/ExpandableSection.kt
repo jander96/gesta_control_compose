@@ -48,11 +48,12 @@ fun ExpandableSection(
     colors: CardColors = CardDefaults.cardColors(),
     elevation: CardElevation = CardDefaults.cardElevation(),
     border: BorderStroke? = null,
+    isExpanded: Boolean = false,
+    onExpandClick : () -> Unit = {}
 ) {
 
-    var isCalendarGroupExpand by rememberSaveable() { mutableStateOf(false) }
     val icon =
-        if (isCalendarGroupExpand) Icons.Default.KeyboardArrowUp
+        if (isExpanded) Icons.Default.KeyboardArrowUp
         else Icons.Default.KeyboardArrowDown
 
     Card(
@@ -69,7 +70,7 @@ fun ExpandableSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        isCalendarGroupExpand = !isCalendarGroupExpand
+                        onExpandClick()
                     }
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,13 +80,13 @@ fun ExpandableSection(
                 }
 
                 IconButton(onClick = {
-                    isCalendarGroupExpand = !isCalendarGroupExpand
+                    onExpandClick()
                 }) {
                     Icon(imageVector = icon, contentDescription = null)
                 }
             }
 
-            AnimatedVisibility(isCalendarGroupExpand) {
+            AnimatedVisibility(isExpanded) {
                 Spacer16()
                 Divider(modifier = Modifier.padding(horizontal = 8.dp))
                 SpacerBy(80)

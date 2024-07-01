@@ -43,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +88,12 @@ fun EditionPage(
     pregnant = state.pregnant
     val formState = FormState(context,pregnant)
     var photo : Uri? by remember{  mutableStateOf(null) }
-
+    var isExpandedGeneral by rememberSaveable() { mutableStateOf((false)) }
+    var isExpandedFallowing by rememberSaveable() { mutableStateOf((false)) }
+    var isExpandedRisk by rememberSaveable() { mutableStateOf((false)) }
+    isExpandedGeneral = pregnant != null
+    isExpandedFallowing = pregnant != null
+    isExpandedRisk = pregnant != null
 
     //Temporary
     val fileName = Calendar.getInstance().timeStamp(".jpg")
@@ -200,6 +206,12 @@ fun EditionPage(
                 )
 
                 FormularyEditor(
+                    isExpandedGeneral = isExpandedGeneral,
+                    isExpandedFallowing = isExpandedFallowing,
+                    isExpandedRisk = isExpandedRisk,
+                    onExpandedGeneralClick = {isExpandedGeneral = !isExpandedGeneral},
+                    onExpandedFallowingClick = {isExpandedFallowing = !isExpandedFallowing},
+                    onExpandedRiskClick = {isExpandedRisk = !isExpandedRisk},
                     formState = formState,
                     onContactClick = {
                         contactPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
@@ -256,7 +268,7 @@ fun HeaderEditor(
                 targetState = image,
                 label = "image_change_animation",
             ) {
-                UriImage(imageUri = it, placeholder = R.drawable.woman_avatar)
+                UriImage(imageUri = it, placeholder = R.drawable.woman_avatar, size = 160.dp)
             }
 
             ImageSelectorRow(
@@ -280,10 +292,18 @@ fun FormularyEditor(
     modifier: Modifier = Modifier,
     formState: FormState,
     onContactClick: ()->Unit,
+    isExpandedGeneral : Boolean = false,
+    isExpandedFallowing : Boolean = false,
+    isExpandedRisk : Boolean = false,
+    onExpandedGeneralClick: () -> Unit = {},
+    onExpandedFallowingClick: () -> Unit = {},
+    onExpandedRiskClick: () -> Unit = {},
 ) {
     Column {
 
         ExpandableSection(
+            isExpanded = isExpandedGeneral,
+            onExpandClick = onExpandedGeneralClick,
             modifier = Modifier.fillMaxWidth(),
             leading = {
                 Icon(
@@ -458,6 +478,8 @@ fun FormularyEditor(
         Spacer16()
 
         ExpandableSection(
+            isExpanded = isExpandedFallowing,
+            onExpandClick = onExpandedFallowingClick,
             modifier = Modifier.fillMaxWidth(),
             leading = {
                 Icon(
@@ -490,6 +512,8 @@ fun FormularyEditor(
 
         ExpandableSection(
             modifier = Modifier.fillMaxWidth(),
+            isExpanded = isExpandedRisk,
+            onExpandClick = onExpandedRiskClick,
             leading = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_radio_button_group_svg),
