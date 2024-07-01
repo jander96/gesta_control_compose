@@ -4,6 +4,7 @@ import com.devj.gestantescontrolcompose.common.basemvi.MviAction
 
 sealed class HomeAction : MviAction{
     object LoadRequirements : HomeAction()
+    object LoadStats : HomeAction()
     data class DeletePregnant(val id: Int) : HomeAction()
     data class Search(val query: String) : HomeAction()
 }

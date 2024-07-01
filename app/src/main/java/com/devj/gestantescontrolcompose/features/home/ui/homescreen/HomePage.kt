@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -67,6 +68,9 @@ fun HomePage(
     val scrollState = rememberLazyListState()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var pregnantId by rememberSaveable { mutableStateOf<Int?>(null) }
+    val total = viewState.total.collectAsState(initial = 0).value
+    val onRisk = viewState.onRisk.collectAsState(initial = 0).value
+    val onFinalPeriod = viewState.onFinalPeriod.collectAsState(initial = 0).value
     Scaffold(
         floatingActionButton = {
             AnimatedVisibility(
@@ -101,15 +105,9 @@ fun HomePage(
             Spacer16()
             HomeHeader(
                 stats = Stats(
-                    total = listOfPregnant.size,
-                    onRisk = listOfPregnant.count { it.riskClassification == RiskClassification.HEIGHT_RISK },
-                    onFinalPeriod = listOfPregnant.count {
-                        if (it.isFUMReliable) {
-                            it.gestationalAgeByFUM.toFloat() >= 37.0
-                        } else {
-                            it.gestationalAgeByFirstUS.toFloat() >= 37.0
-                        }
-                    },
+                    total = total,
+                    onRisk = onRisk,
+                    onFinalPeriod = onFinalPeriod,
                 ),
                 onSearch = {query->
                     homeViewModel.sendUiEvent(HomeIntent.OnSearch(query))

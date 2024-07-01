@@ -3,9 +3,11 @@ package com.devj.gestantescontrolcompose.features.home.domain
 
 
 
+import com.devj.gestantescontrolcompose.app.navigation.Home
 import com.devj.gestantescontrolcompose.common.basemvi.MviResult
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 
 sealed class HomeEffect : MviResult {
@@ -21,4 +23,10 @@ sealed class HomeEffect : MviResult {
         object DeleteSuccessfully : HomeEffect()
 
     }
+    data class StatsResult(
+        val total: Flow<Int> = flowOf(0),
+        val onRisk: Flow<Int> = flowOf(0),
+        val onFinalPeriod: Flow<Int> = flowOf(0),
+        ) : HomeEffect()
+
 }

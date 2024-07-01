@@ -1,8 +1,10 @@
 package com.devj.gestantescontrolcompose.features.home.ui.viewmodel
 
 import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
+import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.domain.usescases.DeletePregnantById
 import com.devj.gestantescontrolcompose.common.domain.usescases.GetAllPregnant
+import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.common.presenter.model.UIMapper
 import com.devj.gestantescontrolcompose.features.home.domain.HomeAction
 import com.devj.gestantescontrolcompose.features.home.domain.HomeEffect
@@ -10,7 +12,9 @@ import com.devj.gestantescontrolcompose.features.home.domain.HomeIntent
 import com.devj.gestantescontrolcompose.features.home.domain.use_case.SearchByName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -28,10 +32,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         sendUiEvent(HomeIntent.EnterAtHome)
+        sendUiEvent(HomeIntent.LoadStats)
     }
 
      override suspend fun process(action: HomeAction): HomeEffect {
         return when (action) {
+            HomeAction.LoadStats -> loadStats()
             HomeAction.LoadRequirements -> load()
             is HomeAction.DeletePregnant -> delete(action.id)
             is HomeAction.Search -> searchByFullName(action.query)
@@ -44,6 +50,31 @@ class HomeViewModel @Inject constructor(
                 HomeEffect.PregnantListUpdate.Success(result)
             },
             onFailure = { error -> HomeEffect.PregnantListUpdate.Error(error) }
+        )
+    }
+
+    private fun loadStats(): HomeEffect {
+        return getAllPregnant().fold(
+            onSuccess = {result->
+
+                HomeEffect.StatsResult(
+                    onRisk = result.map { list->
+                        list.map { uiMapper.fromDomain(it) }.count {
+                            it.riskClassification == RiskClassification.HEIGHT_RISK
+                        }
+                    },
+                    onFinalPeriod = result.map { list->
+                        list.map { uiMapper.fromDomain(it) }.count {
+                            if (it.isFUMReliable) it.gestationalAgeByFUM.toFloat() >= 37.0
+                            else it.gestationalAgeByFirstUS.toFloat() >= 37.0
+                        }
+                    },
+                    total =  result.map {list->
+                        list.map { uiMapper.fromDomain(it) }.count()
+                    },
+                )
+            },
+            onFailure = {  HomeEffect.StatsResult() }
         )
     }
     private suspend fun delete(id: Int): HomeEffect{
@@ -121,6 +152,11 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
+            is HomeEffect.StatsResult -> oldState.copy(
+                total = result.total,
+                onRisk = result.onRisk,
+                onFinalPeriod = result.onFinalPeriod
+            )
         }
     }
 }

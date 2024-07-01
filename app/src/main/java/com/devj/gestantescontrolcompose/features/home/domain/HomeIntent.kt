@@ -5,6 +5,7 @@ import com.devj.gestantescontrolcompose.common.basemvi.MviIntent
 
 sealed class HomeIntent: MviIntent{
     object EnterAtHome : HomeIntent()
+    object LoadStats : HomeIntent()
     data class OnDeletePressed(val pregnantId : Int): HomeIntent()
 
     data class OnSearch(val query: String) : HomeIntent()
@@ -12,9 +13,10 @@ sealed class HomeIntent: MviIntent{
 
     override fun mapToAction(): HomeAction {
         return when(this){
-            HomeIntent.EnterAtHome -> HomeAction.LoadRequirements
-            is HomeIntent.OnDeletePressed -> HomeAction.DeletePregnant(pregnantId)
-            is HomeIntent.OnSearch -> HomeAction.Search(query)
+            EnterAtHome -> HomeAction.LoadRequirements
+            is OnDeletePressed -> HomeAction.DeletePregnant(pregnantId)
+            is OnSearch -> HomeAction.Search(query)
+            LoadStats -> HomeAction.LoadStats
         }
     }
 

@@ -29,13 +29,12 @@ fun ScheduleHeader(
 ) {
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            UriImage(imageUri = null, placeholder = R.drawable.woman_avatar, size = 40.dp )
-            Spacer8()
-            Column {
+
+
                 Text(text = date ,
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
-                Text(text = username, style = MaterialTheme.typography.labelLarge)
-            }
+
+
         }
         Spacer16()
 
