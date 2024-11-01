@@ -13,4 +13,5 @@ sealed class SchedulerAction: MviAction{
     data class ChangeTime(val time: String): SchedulerAction()
     data class ChangeText(val text: String): SchedulerAction()
     data class SaveAddressee(val addressee: List<String>): SchedulerAction()
+    data class ToggleAlertVisibility(val isVisible: Boolean): SchedulerAction()
 }

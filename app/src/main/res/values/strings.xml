@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GestantesControlCompose</string>
+    <string name="app_name">Gesta Control</string>
     <string name="stats">Estadísticas</string>
     <string name="search_bar">search bar</string>
     <string name="filter">filter</string>

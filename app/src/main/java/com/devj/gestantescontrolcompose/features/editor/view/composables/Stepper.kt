@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -156,23 +157,23 @@ private fun Step(modifier: Modifier = Modifier,
         if (!isComplete) {
             //Line
             if (isRainbow){
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.constrainAs(line){
                         top.linkTo(circle.top)
                         bottom.linkTo(circle.bottom)
                         start.linkTo(circle.end)
                     }.background(rainBowColor),
-                    thickness = 1.dp,
+                    thickness = 1.dp
                 )
             }else{
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.constrainAs(line){
                         top.linkTo(circle.top)
                         bottom.linkTo(circle.bottom)
                         start.linkTo(circle.end)
                     },
-                    color = innerCircleColor,
                     thickness = 1.dp,
+                    color = innerCircleColor
                 )
             }
         }

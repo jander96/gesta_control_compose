@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.Flow
 
 sealed class SchedulerEffect: MviResult{
 
-    object EventSaw: SchedulerEffect()
-    object Clean: SchedulerEffect()
+    data object EventSaw: SchedulerEffect()
+    data object Clean: SchedulerEffect()
 
     sealed class ScheduleMessage: SchedulerEffect(){
-        object Success : ScheduleMessage()
+        data object Success : ScheduleMessage()
         data class Error(val error: Throwable): ScheduleMessage()
     }
     sealed class CancelMessage: SchedulerEffect(){
-        object Success : CancelMessage()
+        data object Success : CancelMessage()
         data class Error(val error: Throwable): CancelMessage()
     }
     sealed class InitialLoad : SchedulerEffect(){
@@ -33,7 +33,7 @@ sealed class SchedulerEffect: MviResult{
 
 
     sealed class BatteryOptimization: SchedulerEffect(){
-        object Enabled : BatteryOptimization()
-        object Disabled : BatteryOptimization()
+        data object Enabled : BatteryOptimization()
+        data object Disabled : BatteryOptimization()
     }
 }

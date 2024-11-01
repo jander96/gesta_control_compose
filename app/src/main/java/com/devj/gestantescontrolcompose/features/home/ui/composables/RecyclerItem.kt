@@ -40,6 +40,7 @@ import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
+import com.devj.gestantescontrolcompose.common.extensions.Spacer8
 import com.devj.gestantescontrolcompose.common.extensions.getIMClassification
 import com.devj.gestantescontrolcompose.common.presenter.composables.CircularIndicator
 import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
@@ -102,7 +103,9 @@ fun RecyclerItem(
             }
 
             Row(
-                modifier = modifier.padding(horizontal = 8.dp),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
             ) {
                 Text(
                     pregnant.name,
@@ -121,7 +124,7 @@ fun RecyclerItem(
                 }
             }
 
-            Spacer16()
+            Spacer4()
             Row(modifier = modifier
                 .fillMaxWidth()
                 .padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -177,16 +180,10 @@ fun RecyclerItem(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
 
-                            CircularIndicator(
-                                smallText = "IMC",
-                                indicatorValue = pregnant.iMC.toFloat(),
-                                maxIndicatorValue = 40f,
-                                canvasSize = 56.dp,
-                            )
-                            Spacer4()
                             Text(
-                                pregnant.iMC.toDouble().getIMClassification(),
-                                style = MaterialTheme.typography.bodySmall
+                                "${pregnant.iMC} Kg/m2",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold,
+                                    )
                             )
                         }
 

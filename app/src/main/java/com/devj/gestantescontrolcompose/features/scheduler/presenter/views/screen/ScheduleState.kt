@@ -13,6 +13,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalDensity
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.textualDate
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import kotlinx.coroutines.CoroutineScope
@@ -58,7 +59,7 @@ class ScheduleState (
 fun rememberScheduleState():ScheduleState {
     return ScheduleState(
        scaffoldState =  rememberBottomSheetScaffoldState(
-           SheetState(skipHiddenState = false, skipPartiallyExpanded = false)
+           SheetState(skipPartiallyExpanded = false, skipHiddenState = false, density = LocalDensity.current)
        ),
         lazyListState = rememberLazyListState(),
         scope = rememberCoroutineScope(),

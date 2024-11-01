@@ -192,7 +192,9 @@ fun MessageSchedulePage(
                 BatteryDialog(onConfirm = {
                     openBatterySettings(batteryIntent)
                 },
-                    onDismissRequest = {})
+                    onDismissRequest = {
+                        viewModel.sendUiEvent(SchedulerIntent.ToggleBatteryAlert(false))
+                    })
             }
 
             ScheduleHeader(
@@ -278,7 +280,6 @@ fun MessageSchedulePage(
                 },
                 onSendClick = {
                     smsPermission.launch(Manifest.permission.SEND_SMS)
-//                    openBatterySettings(context)
 
                     //trabajo asyncrono
                     if (it.isEmpty()) {

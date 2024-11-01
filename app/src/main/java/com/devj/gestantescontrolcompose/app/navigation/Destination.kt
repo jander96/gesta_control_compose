@@ -5,7 +5,7 @@ import androidx.navigation.navArgument
 import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
 
-interface Destination{
+interface Destination {
     val name: String
     val route: String
 }
@@ -18,13 +18,13 @@ object Home : Destination {
 object Edition: Destination {
      object Arguments {
 
-        const val pregnant = "pregnant"
+        const val PREGNANT = "pregnant"
     }
     override val name = "Edicion"
     override val route = "edition"
-    const val routeWithParams = "edition/?pregnant={${Arguments.pregnant}}"
+    const val ROUTE_WITH_PARAMS = "edition/?pregnant={${Arguments.PREGNANT}}"
 
-    val arguments = listOf(navArgument(Arguments.pregnant) {
+    val arguments = listOf(navArgument(Arguments.PREGNANT) {
         type = NavType.IntType
     },)
 

@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,26 +25,23 @@ import com.devj.gestantescontrolcompose.common.extensions.Spacer8
 @Composable
 fun BatteryDialog(modifier: Modifier = Modifier, onConfirm : () -> Unit, onDismissRequest : ()-> Unit) {
 
-    AlertDialog(
-        modifier = modifier.padding(32.dp),
-
-        onDismissRequest = onDismissRequest)
-
-    {
+    BasicAlertDialog(onDismissRequest = onDismissRequest, modifier = modifier.padding(32.dp)) {
         Card() {
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     stringResource(R.string.battery_optimization_msg),
-                    textAlign = TextAlign.Justify
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelSmall
                 )
 
 
                 Spacer8()
 
                 Row {
-                    OutlinedButton(modifier = Modifier.fillMaxWidth(),onClick = onConfirm) {
+                    OutlinedButton(modifier = Modifier, onClick = onConfirm) {
                         Text("Ok")
                     }
                 }

@@ -9,7 +9,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,8 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
@@ -94,24 +93,17 @@ fun MyApp(modifier: Modifier = Modifier) {
                 exit = slideOutVertically(tween(500,200)){it},
 
                 ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    BottomNavigation(
-                        modifier = modifier.padding(4.dp),
-                        navState = navState,
-                        onDestinationClick = { index ->
-                            when (index) {
-                                0 -> navController.launchSingleTopTo(Home.route)
-                                1 -> navController.launchSingleTopTo(Calculator.route)
-                                2 -> navController.launchSingleTopTo(Scheduler.route)
-                            }
+                BottomNavigation(
+                    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    navState = navState,
+                    onDestinationClick = { index ->
+                        when (index) {
+                            0 -> navController.launchSingleTopTo(Home.route)
+                            1 -> navController.launchSingleTopTo(Calculator.route)
+                            2 -> navController.launchSingleTopTo(Scheduler.route)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     ) {paddingValues->
@@ -120,7 +112,7 @@ fun MyApp(modifier: Modifier = Modifier) {
             NavHost(
                 modifier = modifier
                     .fillMaxSize()
-                    .clickable { focusManager.clearFocus() },
+                    .clickable(role = Role.Image) { focusManager.clearFocus() },
                 navController = navController,
                 startDestination = Home.route,
             ) {
@@ -140,8 +132,8 @@ fun MyApp(modifier: Modifier = Modifier) {
                 composable(route = Calculator.route ) {
                     CalculatorPage()
                 }
-                composable(route = Edition.routeWithParams, arguments = Edition.arguments) { navBackStackEntry->
-                    val pregnant = navBackStackEntry.arguments?.getInt(Edition.Arguments.pregnant)
+                composable(route = Edition.ROUTE_WITH_PARAMS, arguments = Edition.arguments) { navBackStackEntry->
+                    val pregnant = navBackStackEntry.arguments?.getInt(Edition.Arguments.PREGNANT)
 
                     EditionPage(pregnant, onSaveTap = {
                         navController.popBackStack()

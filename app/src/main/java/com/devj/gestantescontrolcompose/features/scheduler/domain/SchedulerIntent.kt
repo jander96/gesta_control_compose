@@ -14,6 +14,7 @@ sealed class SchedulerIntent: MviIntent{
     data class OnTextChanged(val text: String): SchedulerIntent()
     data class OnAddresseePicked(val addressee: List<String>): SchedulerIntent()
     data class OnSendClick(val message: Message): SchedulerIntent()
+    data class ToggleBatteryAlert(val isVisible: Boolean): SchedulerIntent()
 
     override fun mapToAction(): MviAction {
         return when (this) {
@@ -27,6 +28,7 @@ sealed class SchedulerIntent: MviIntent{
             is OnSendClick -> SchedulerAction.SaveNewSchedule(message)
             MessageSaw -> SchedulerAction.MessageSaw
             OnCleanClick -> SchedulerAction.CleanFields
+            is ToggleBatteryAlert -> SchedulerAction.ToggleAlertVisibility(isVisible)
         }
     }
 }

@@ -229,11 +229,11 @@ class FormState ( private val context: Context) {
         this.phoneErrorMessage = validatePhone(phone)
     }
     fun changeName(name : String){
-        this._name = name
+        this._name = name.trim()
         this.nameErrorMessage = validateName(name)
     }
     fun changeLastname (lastname: String){
-        this._lastName = lastname
+        this._lastName = lastname.trim()
         this.lastNameErrorMessage = validateLastname(lastname)
     }
     fun changeAge(age : String){

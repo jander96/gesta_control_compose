@@ -16,6 +16,7 @@ fun <T> NavBackStackEntry.getSafeParcelable(key: String, clazz: Class<T> ): T?{
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         this.arguments?.getParcelable(key, clazz)
     } else {
+        @Suppress("DEPRECATION")
         this.arguments?.getParcelable(key)
     }
 }

@@ -18,7 +18,8 @@ object DateTimeHelper{
     val yearMonthDayFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)
     val yearMonthDayHourMinutesFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOUR_MINUTES)
     val hourMinutesAmFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern(HOUR_MINUTES_am)
-    val dayOfWeekMonthFormatter : DateTimeFormatter= DateTimeFormatter.ofPattern(DAY_OF_WEEK_MONTH)
+    val dayOfWeekMonthFormatter : DateTimeFormatter= DateTimeFormatter.ofPattern(DAY_OF_WEEK_MONTH).withLocale( Locale("es"))
+
     val dayOfMothHourMinutesFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern(DAY_OF_MONTH_HOUR_MINUTES_am)
     val dayOfMonthYearFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern(DAY_OF_MONTH_OF_YEAR, Locale("es", "ES"))
     val fullDateTimeAmFormatter : DateTimeFormatter= DateTimeFormatter.ofPattern(FULL_DATE_TIME_am)
@@ -43,8 +44,7 @@ object DateTimeHelper{
 
     fun LocalDateTime.textualDate(): String {
         val formatter = dayOfWeekMonthFormatter
-        return formatter.format(this)
+        return formatter.format(this, )
     }
 
 }
-

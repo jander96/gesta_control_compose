@@ -1,5 +1,6 @@
 package com.devj.gestantescontrolcompose.app.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -7,9 +8,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.automirrored.outlined.Message
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.outlined.Calculate
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +27,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,14 +44,23 @@ fun BottomNavigation(
 ) {
 
 
-    Row(modifier = modifier,horizontalArrangement = Arrangement.Center) {
+    Row(modifier = modifier.background(color = Color.Transparent),horizontalArrangement = Arrangement.Center) {
         Surface(
-            shape = MaterialTheme.shapes.medium.copy(CornerSize(50.dp)),
+            shape = MaterialTheme.shapes.medium.copy(CornerSize(20.dp)),
             modifier = modifier.height(48.dp),
             tonalElevation = 4.dp,
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             val withScreen = LocalConfiguration.current.screenWidthDp
+            val  colors = NavigationBarItemColors(
+                selectedIconColor = MaterialTheme.colorScheme.surface,
+                selectedTextColor = MaterialTheme.colorScheme.surface,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledIconColor = MaterialTheme.colorScheme.onSurface,
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
+            )
 
             Row(
                 modifier = modifier
@@ -59,10 +79,11 @@ fun BottomNavigation(
                     icon = {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.ic_home_svg),
+                            imageVector = Icons.Outlined.Home,
                             contentDescription = stringResource(R.string.home)
                         )
                     },
+                    colors = colors
                 )
 
                 NavigationBarItem(
@@ -74,10 +95,11 @@ fun BottomNavigation(
                     icon = {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.ic_calculator_svg),
+                            imageVector = Icons.Outlined.Calculate,
                             contentDescription = stringResource(R.string.calculator)
                         )
                     },
+                    colors = colors
                 )
 
                 NavigationBarItem(
@@ -89,10 +111,11 @@ fun BottomNavigation(
                     icon = {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            painter = painterResource(R.drawable.ic_schedule_svg),
-                            contentDescription = stringResource(R.string.scheduler)
+                            imageVector = Icons.AutoMirrored.Outlined.Message,
+                            contentDescription = "Favorite",
                         )
                     },
+                    colors = colors
                 )
             }
         }

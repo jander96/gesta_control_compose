@@ -47,6 +47,8 @@ class SchedulerViewModel @Inject constructor(
             is SchedulerAction.SaveAddressee -> changeAddressee(action.addressee)
             SchedulerAction.MessageSaw -> SchedulerEffect.EventSaw
             SchedulerAction.CleanFields -> SchedulerEffect.Clean
+            is SchedulerAction.ToggleAlertVisibility ->
+                if (action.isVisible) SchedulerEffect.BatteryOptimization.Enabled else SchedulerEffect.BatteryOptimization.Disabled
         }
     }
     private fun load(): SchedulerEffect {
