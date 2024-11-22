@@ -72,7 +72,14 @@ fun MessageSchedulePage(
 
     val smsPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-
+            if(granted) {
+                pageState.smsPermissionDenied(false)
+                pageState.messageToSend.value?.let {
+                    viewModel.sendUiEvent(SchedulerIntent.OnSendClick(it))
+                }
+            }else {
+                pageState.smsPermissionDenied(true)
+            }
         }
     val batteryIntent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
         viewModel.sendUiEvent(SchedulerIntent.CheckPowerSetup)
@@ -188,6 +195,26 @@ fun MessageSchedulePage(
                 }
             }
 
+            LaunchedEffect(key1 = pageState.smsPermissionDenied.value) {
+                if (pageState.smsPermissionDenied.value) {
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = "SMS permission denied",
+                        actionLabel = "Ok",
+                        duration = SnackbarDuration.Indefinite
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
+                            viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                        }
+
+                        SnackbarResult.Dismissed -> {}
+                    }
+
+                    viewModel.sendUiEvent(SchedulerIntent.MessageSaw)
+                }
+            }
+
             if(showDialogBattery){
                 BatteryDialog(onConfirm = {
                     openBatterySettings(batteryIntent)
@@ -281,31 +308,16 @@ fun MessageSchedulePage(
                 onSendClick = {
                     smsPermission.launch(Manifest.permission.SEND_SMS)
 
-                    //trabajo asyncrono
-                    if (it.isEmpty()) {
                         val dateTime = "${viewState.date} ${viewState.time}"
                         val messageScheduled = Message(
-                            id = "${UUID.randomUUID()}_$dateTime",
+                            id = it.ifEmpty { "${UUID.randomUUID()}_$dateTime" },
                             message = viewState.text ?: "",
                             dateTime = dateTime,
                             tag = "${UUID.randomUUID()}",
                             addressees = viewState.addressee
                         )
 
-                        viewModel.sendUiEvent(SchedulerIntent.OnSendClick(messageScheduled))
-
-                    } else {
-                        val dateTime = "${viewState.date} ${viewState.time}"
-                        val messageScheduled = Message(
-                            id = it,
-                            message = viewState.text ?: "",
-                            dateTime = dateTime,
-                            tag = "${UUID.randomUUID()}",
-                            addressees = viewState.addressee
-                        )
-
-                        viewModel.sendUiEvent(SchedulerIntent.OnSendClick(messageScheduled))
-                    }
+                    pageState.setMessageToSend(messageScheduled)
                     pageState.scope.launch {
                         pageState.scaffoldState.bottomSheetState.hide()
                     }

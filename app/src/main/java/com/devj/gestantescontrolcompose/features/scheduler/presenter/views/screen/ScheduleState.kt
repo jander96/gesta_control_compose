@@ -22,14 +22,16 @@ import java.time.LocalDateTime
 class ScheduleState (
     val scaffoldState: BottomSheetScaffoldState,
     val lazyListState: LazyListState,
-    val scope: CoroutineScope,
-    var showCalendar: MutableState<Boolean>,
-    var showTimePicker: MutableState<Boolean>,
-    var showAddresseePicker: MutableState<Boolean>,
-    var showDeleteDialog:  MutableState<Boolean>,
-    val dateNow: String,
-    val messageToDelete: MutableState<Message?>,
-    val messageToEdit: MutableState<Message?>,
+    val scope: CoroutineScope ,
+    var showCalendar: MutableState<Boolean> = mutableStateOf(false),
+    var showTimePicker: MutableState<Boolean> = mutableStateOf(false),
+    var showAddresseePicker: MutableState<Boolean> = mutableStateOf(false),
+    var showDeleteDialog:  MutableState<Boolean>  = mutableStateOf(false),
+    val dateNow: String = LocalDateTime.now().textualDate(),
+    val messageToDelete: MutableState<Message?> = mutableStateOf(null),
+    val messageToEdit: MutableState<Message?> = mutableStateOf(null),
+    val messageToSend: MutableState<Message?>  = mutableStateOf(null),
+    val smsPermissionDenied: MutableState<Boolean> = mutableStateOf(false)
 ){
     fun calendarVisibility (value: Boolean){
         showCalendar.value = value
@@ -51,6 +53,14 @@ class ScheduleState (
 
     fun setMessageToEdit(message: Message?){
         messageToEdit.value = message
+    }
+
+    fun setMessageToSend(message: Message?){
+        messageToSend.value = message
+    }
+
+    fun smsPermissionDenied(value: Boolean){
+        smsPermissionDenied.value = value
     }
 
 }
@@ -81,7 +91,12 @@ fun rememberScheduleState():ScheduleState {
         },
         messageToEdit = rememberSaveable {
             mutableStateOf(null)
-        }
-
+        },
+        messageToSend = rememberSaveable {
+            mutableStateOf(null)
+        },
+         smsPermissionDenied = rememberSaveable {
+             mutableStateOf(false)
+         }
     )
 }
