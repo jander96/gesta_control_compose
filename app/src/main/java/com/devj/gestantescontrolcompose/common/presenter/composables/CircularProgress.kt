@@ -61,7 +61,7 @@ fun CircularIndicator(
 ) {
 
 
-    var allowedIndicatorValue by remember { mutableFloatStateOf(maxIndicatorValue)}
+    var allowedIndicatorValue by remember { mutableFloatStateOf(maxIndicatorValue) }
 
     allowedIndicatorValue = if (hasTop) {
         if (indicatorValue <= maxIndicatorValue) indicatorValue
@@ -70,9 +70,9 @@ fun CircularIndicator(
         indicatorValue
     }
 
-    var animatedIndicatorValue by remember{ mutableFloatStateOf(0f) }
+    var animatedIndicatorValue by remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(allowedIndicatorValue){
+    LaunchedEffect(allowedIndicatorValue) {
         animatedIndicatorValue =
             if (allowedIndicatorValue < maxIndicatorValue) allowedIndicatorValue
             else maxIndicatorValue
@@ -83,7 +83,7 @@ fun CircularIndicator(
         targetValue = (2.4 * percentage).toFloat(),
         label = "sweepAngle",
         animationSpec = tween(1000)
-        )
+    )
 
 
     val animatedTextColor by animateColorAsState(
@@ -112,13 +112,14 @@ fun CircularIndicator(
             .size(canvasSize)
             .drawBehind {
                 val componentSize = size / 1.25f
-                backgroundIndicator(
+                arcProgress(
+                    sweepAngle = 240f,
                     componentSize = componentSize,
                     indicatorColor = backgroundIndicatorColor,
                     indicatorStrokeWidth = backgroundIndicatorStrokeWidth,
                     indicatorStrokeCap = indicatorStrokeCap,
                 )
-                foregroundIndicator(
+                arcProgress(
                     sweepAngle = sweepAngle,
                     componentSize = componentSize,
                     indicatorColor = animatedForegroundColor,
@@ -144,30 +145,9 @@ fun CircularIndicator(
     }
 }
 
-fun DrawScope.backgroundIndicator(
-    componentSize: Size,
-    indicatorColor: Color,
-    indicatorStrokeWidth: Float,
-    indicatorStrokeCap: StrokeCap
-){
-    drawArc(
-        size = componentSize,
-        color = indicatorColor,
-        startAngle = 150f,
-        sweepAngle = 240f,
-        useCenter = false,
-        style = Stroke(
-            width = indicatorStrokeWidth,
-            cap = indicatorStrokeCap
-        ),
-        topLeft = Offset(
-            x =  (size.width - componentSize.width) * 0.5f,
-            y = (size.height - componentSize.height) * 0.5f
-        )
-    )
-}
 
-fun DrawScope.foregroundIndicator(
+
+fun DrawScope.arcProgress(
     sweepAngle: Float,
     componentSize: Size,
     indicatorColor: Color,

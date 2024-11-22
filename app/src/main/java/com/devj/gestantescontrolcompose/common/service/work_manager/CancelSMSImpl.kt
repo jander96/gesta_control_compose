@@ -10,8 +10,8 @@ import javax.inject.Inject
 class CancelSMSImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ): SMSCancel{
-    override fun cancel(data: Message) {
+    override fun cancel(message: Message) {
         val workManager = WorkManager.getInstance(context)
-        workManager.cancelUniqueWork(data.id)
+        workManager.cancelUniqueWork(message.id)
     }
 }

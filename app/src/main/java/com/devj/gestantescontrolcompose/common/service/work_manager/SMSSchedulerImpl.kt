@@ -1,6 +1,7 @@
 package com.devj.gestantescontrolcompose.common.service.work_manager
 
 import android.content.Context
+import android.os.Build
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
@@ -29,24 +30,28 @@ class SMSSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     ): SMSScheduler {
 
-    override fun schedule(data: Message) {
-        data.addressees.forEach { phoneNumber ->
+    override fun schedule(message: Message) {
+        message.addressees.forEach { phoneNumber ->
             val formatter = DateTimeHelper.fullDateTimeAmFormatter
-            val safeDate = formatter.parse(data.dateTime)
+            val safeDate = formatter.parse(message.dateTime)
             val date = LocalDateTime.from(safeDate).plusSeconds(15)
 
             val inputMessage: Data = workDataOf(
-                Constants.KEY_MESSAGE to data.message,
+                Constants.KEY_MESSAGE to message.message,
                 Constants.KEY_PHONE to phoneNumber,
             )
 
-            val smsWork = OneTimeWorkRequestBuilder<SMSWorker>()
-                .setInputData(inputMessage)
-                .setInitialDelay(calculateDelayByDateTime(date))
-                .addTag(data.tag)
-                .build()
+            val smsWork = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OneTimeWorkRequestBuilder<SMSWorker>()
+                    .setInputData(inputMessage)
+                    .setInitialDelay(calculateDelayByDateTime(date))
+                    .addTag(message.tag)
+                    .build()
+            } else {
+                TODO("VERSION.SDK_INT < O")
+            }
             WorkManager.getInstance(context)
-                .enqueueUniqueWork(data.tag, ExistingWorkPolicy.REPLACE,smsWork)
+                .enqueueUniqueWork(message.tag, ExistingWorkPolicy.REPLACE,smsWork)
 
         }
     }

@@ -16,64 +16,71 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalDensity
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.textualDate
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
+import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.MessageSaver
 import kotlinx.coroutines.CoroutineScope
 import java.time.LocalDateTime
 
-class ScheduleState (
+class ScheduleState(
     val scaffoldState: BottomSheetScaffoldState,
     val lazyListState: LazyListState,
-    val scope: CoroutineScope ,
+    val scope: CoroutineScope,
     var showCalendar: MutableState<Boolean> = mutableStateOf(false),
     var showTimePicker: MutableState<Boolean> = mutableStateOf(false),
     var showAddresseePicker: MutableState<Boolean> = mutableStateOf(false),
-    var showDeleteDialog:  MutableState<Boolean>  = mutableStateOf(false),
+    var showDeleteDialog: MutableState<Boolean> = mutableStateOf(false),
     val dateNow: String = LocalDateTime.now().textualDate(),
     val messageToDelete: MutableState<Message?> = mutableStateOf(null),
     val messageToEdit: MutableState<Message?> = mutableStateOf(null),
-    val messageToSend: MutableState<Message?>  = mutableStateOf(null),
+    val messageToSend: MutableState<Message?> = mutableStateOf(null),
     val smsPermissionDenied: MutableState<Boolean> = mutableStateOf(false)
-){
-    fun calendarVisibility (value: Boolean){
+) {
+    fun calendarVisibility(value: Boolean) {
         showCalendar.value = value
     }
 
-    fun timePickerVisibility(value: Boolean){
+    fun timePickerVisibility(value: Boolean) {
         showTimePicker.value = value
     }
 
-    fun addresseePickerVisibility(value: Boolean){
+    fun addresseePickerVisibility(value: Boolean) {
         showAddresseePicker.value = value
     }
-    fun deleteDialogVisibility(value: Boolean){
+
+    fun deleteDialogVisibility(value: Boolean) {
         showDeleteDialog.value = value
     }
-    fun setMessageToDelete(message: Message){
+
+    fun setMessageToDelete(message: Message) {
         messageToDelete.value = message
     }
 
-    fun setMessageToEdit(message: Message?){
+    fun setMessageToEdit(message: Message?) {
         messageToEdit.value = message
     }
 
-    fun setMessageToSend(message: Message?){
+    fun setMessageToSend(message: Message?) {
         messageToSend.value = message
     }
 
-    fun smsPermissionDenied(value: Boolean){
+    fun smsPermissionDenied(value: Boolean) {
         smsPermissionDenied.value = value
     }
 
 }
 
 @Composable
-fun rememberScheduleState():ScheduleState {
+fun rememberScheduleState(): ScheduleState {
     return ScheduleState(
-       scaffoldState =  rememberBottomSheetScaffoldState(
-           SheetState(skipPartiallyExpanded = false, skipHiddenState = false, density = LocalDensity.current)
-       ),
+        scaffoldState = rememberBottomSheetScaffoldState(
+            SheetState(
+                skipPartiallyExpanded = false,
+                skipHiddenState = false,
+                density = LocalDensity.current
+            )
+        ),
         lazyListState = rememberLazyListState(),
         scope = rememberCoroutineScope(),
-        showCalendar  = rememberSaveable {
+        showCalendar = rememberSaveable {
             mutableStateOf(false)
         },
         showTimePicker = rememberSaveable {
@@ -85,18 +92,18 @@ fun rememberScheduleState():ScheduleState {
         showDeleteDialog = rememberSaveable {
             mutableStateOf(false)
         },
-        dateNow =  LocalDateTime.now().textualDate(),
-        messageToDelete = rememberSaveable {
+        dateNow = LocalDateTime.now().textualDate(),
+        messageToDelete = rememberSaveable(stateSaver = MessageSaver) {
             mutableStateOf(null)
         },
-        messageToEdit = rememberSaveable {
+        messageToEdit = rememberSaveable(stateSaver = MessageSaver) {
             mutableStateOf(null)
         },
-        messageToSend = rememberSaveable {
+        messageToSend = rememberSaveable(stateSaver = MessageSaver) {
             mutableStateOf(null)
         },
-         smsPermissionDenied = rememberSaveable {
-             mutableStateOf(false)
-         }
+        smsPermissionDenied = rememberSaveable {
+            mutableStateOf(false)
+        }
     )
 }

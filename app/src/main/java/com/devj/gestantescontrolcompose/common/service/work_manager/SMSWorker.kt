@@ -24,7 +24,11 @@ class SMSWorker(
 
         } catch (e: Exception) {
             print(e.message)
-            Result.failure()
+            if(runAttemptCount < 3){
+                Result.retry()
+            }else{
+                Result.failure()
+            }
         }
     }
 }
