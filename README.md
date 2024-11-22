@@ -8,10 +8,10 @@ Calculador de edad gestacional, seguimiento de gestantes y envio de SMS programa
 
 ### Capturas de Pantalla
 
-| Imagen 1 | Imagen 2 | Imagen 3 |
+|  |  |  |
 |---|---|---|
 | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20240722_152729.png" width="200"> | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20240722_152807.png" width="200"> | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20240722_154651.png" width="200"> |
-| Imagen 4 | Imagen 5 | Imagen 6 |
+|  | | |
 | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20240722_154733.png" width="200"> | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20240722_154754.png" width="200"> | <img src="https://github.com/jander96/gesta_control_compose/blob/main/Screenshot_20241122_040125.png" width="200"> |
 
 
