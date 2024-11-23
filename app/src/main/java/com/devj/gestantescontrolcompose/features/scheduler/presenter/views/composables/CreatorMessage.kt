@@ -27,7 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardTime
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
+import java.time.LocalTime
+import java.time.ZonedDateTime
 
 @Composable
 fun CreatorMessage(
@@ -40,8 +44,8 @@ fun CreatorMessage(
     onSendClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     message: Message? = null,
-    date: String? = null,
-    time: String? = null,
+    date: ZonedDateTime? = null,
+    time: LocalTime? = null,
     remitters: Int? = null,
     isValidMessage: Boolean = false,
 ) {
@@ -128,11 +132,11 @@ fun CreatorMessage(
 
         }
         Row(modifier = Modifier.padding(bottom = 8.dp)) {
-            if (!date.isNullOrBlank())
-                Label(text = date)
+            if (date != null)
+                Label(text = date.toStandardDate())
             Spacer4()
-            if (!time.isNullOrBlank())
-                Label(text = time)
+            if (time !=null )
+                Label(text = time.toStandardTime())
             Spacer4()
             if (remitters != null && remitters != 0)
                 Label(text ="$remitters destinatarias")

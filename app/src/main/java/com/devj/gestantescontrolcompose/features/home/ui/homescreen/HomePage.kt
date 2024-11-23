@@ -153,7 +153,6 @@ fun HomePage(
 @Composable
 fun FAB(onClick: () -> Unit, modifier: Modifier = Modifier) {
     FloatingActionButton(
-        containerColor = MaterialTheme.colorScheme.tertiary,
         modifier = modifier,
         onClick = onClick,
         shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50))

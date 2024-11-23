@@ -42,6 +42,8 @@ import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
 import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toIsoDate
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 
 @Composable
@@ -58,7 +60,7 @@ fun MessageItem(
     }
     val expandedIcon =
         if (!isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp
-    val color =  MaterialTheme.colorScheme.background
+    val color =  MaterialTheme.colorScheme.secondaryContainer
 
     Card(
         colors = CardDefaults.cardColors(containerColor = color ),
@@ -93,7 +95,7 @@ fun MessageItem(
                             modifier = Modifier.padding(horizontal = 4.dp)
                         ){
                             Text(
-                                DateTimeHelper.ymdToHumanReadableDate(message.dateTime),
+                                message.dateTime?.toStandardDate() ?: "",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             )

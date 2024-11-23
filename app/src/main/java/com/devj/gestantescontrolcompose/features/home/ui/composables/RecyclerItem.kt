@@ -61,7 +61,9 @@ fun RecyclerItem(
     val color =
         if (pregnant.riskClassification == RiskClassification.HEIGHT_RISK)
             MaterialTheme.colorScheme.tertiaryContainer
-        else MaterialTheme.colorScheme.background
+        else MaterialTheme.colorScheme.secondaryContainer
+
+
 
     Card(
         colors = CardDefaults.cardColors(containerColor = color ),
@@ -189,7 +191,7 @@ fun RecyclerItem(
 
                         IconButton(
                             colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                             ),
                             onClick = {
                                 onDelete(pregnant)

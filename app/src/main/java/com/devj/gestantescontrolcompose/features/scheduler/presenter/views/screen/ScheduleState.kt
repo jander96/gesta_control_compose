@@ -19,6 +19,7 @@ import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.MessageSaver
 import kotlinx.coroutines.CoroutineScope
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class ScheduleState(
     val scaffoldState: BottomSheetScaffoldState,
@@ -28,7 +29,7 @@ class ScheduleState(
     var showTimePicker: MutableState<Boolean> = mutableStateOf(false),
     var showAddresseePicker: MutableState<Boolean> = mutableStateOf(false),
     var showDeleteDialog: MutableState<Boolean> = mutableStateOf(false),
-    val dateNow: String = LocalDateTime.now().textualDate(),
+    val dateNow: ZonedDateTime = ZonedDateTime.now(),
     val messageToDelete: MutableState<Message?> = mutableStateOf(null),
     val messageToEdit: MutableState<Message?> = mutableStateOf(null),
     val messageToSend: MutableState<Message?> = mutableStateOf(null),
@@ -92,7 +93,7 @@ fun rememberScheduleState(): ScheduleState {
         showDeleteDialog = rememberSaveable {
             mutableStateOf(false)
         },
-        dateNow = LocalDateTime.now().textualDate(),
+        dateNow = ZonedDateTime.now(),
         messageToDelete = rememberSaveable(stateSaver = MessageSaver) {
             mutableStateOf(null)
         },

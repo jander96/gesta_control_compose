@@ -5,6 +5,7 @@ import com.devj.gestantescontrolcompose.common.domain.model.USData
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByFUM
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByUS
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateFPP
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorActions
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorEffect
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorIntent
@@ -24,16 +25,15 @@ class CalculatorViewModel @Inject constructor(
     override val mutableViewState =  MutableStateFlow(CalculatorViewState())
 
     private fun isValidForUSG(state: CalculatorViewState ): Boolean  {
-            if(state.usDate.isBlank())return  false
+            if(state.usDate == null)return  false
             if (state.weeks.isBlank() || state.days.isBlank())  return false
             if(state.weeks.toFloat() > 42f || state.weeks.toFloat() < 0f ) return false
             if(state.days.toFloat() > 6f || state.days.toFloat() < 0f ) return false
             return true
         }
     private fun isValidForFUM(state: CalculatorViewState ): Boolean {
-            if (state.fumDate.isBlank()) return false
-            return true
-        }
+        return state.fumDate != null
+    }
 
 
     override suspend fun process(action: CalculatorActions): CalculatorEffect {
@@ -51,10 +51,12 @@ class CalculatorViewModel @Inject constructor(
     private fun calculateGE(): CalculatorEffect {
 
         return if (viewState.value.isUsActive) {
-            val newDate = calculateByUS(
-                viewState.value.usDate,
-                viewState.value.weeks.toInt(), viewState.value.days.toInt()
-            )
+            val newDate = viewState.value.usDate?.let {
+                calculateByUS(
+                    it,
+                    viewState.value.weeks.toInt(), viewState.value.days.toInt()
+                )
+            }
             val fpp  = calculateFPP(
                 null,
                 USData(
@@ -64,13 +66,13 @@ class CalculatorViewModel @Inject constructor(
                 )
             )
 
-            CalculatorEffect.GestationalAgeCalculated(newDate ?: "0", fpp)
+            CalculatorEffect.GestationalAgeCalculated(newDate ?: "0", fpp.toStandardDate())
         } else {
-            val newDate = calculateByFUM(viewState.value.fumDate)
+            val newDate = viewState.value.fumDate?.let { calculateByFUM(it) }
             val fpp = calculateFPP(
                 viewState.value.fumDate,null
             )
-            CalculatorEffect.GestationalAgeCalculated(newDate ?: "0", fpp)
+            CalculatorEffect.GestationalAgeCalculated(newDate ?: "0", fpp.toStandardDate())
         }
 
     }

@@ -7,6 +7,7 @@ import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByFUM
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateByUS
 import com.devj.gestantescontrolcompose.common.domain.usescases.CalculateFPP
 import com.devj.gestantescontrolcompose.common.extensions.ifNullReturnEmpty
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
 import java.text.DecimalFormat
 import javax.inject.Inject
 
@@ -31,11 +32,11 @@ class UIMapper @Inject constructor(
                     getIMC(measures.weight, measures.size)
                 else "",
                 isFUMReliable = dataDate.isFUMReliable,
-                fum = dataDate.fUM ?: "",
-                gestationalAgeByFUM = if (!dataDate.fUM.isNullOrEmpty())
+                fum = dataDate.fUM,
+                gestationalAgeByFUM = if (dataDate.fUM != null)
                     calculateByFUM(dataDate.fUM) ?: "+42"
                 else "",
-                dataDate.firstFUG ?: "",
+                dataDate.firstFUG,
                 gestationalAgeByFirstUS = if (dataDate.firstFUG != null &&
                     dataDate.firstUSWeeks != null &&
                     dataDate.firstUSDays != null
@@ -46,7 +47,7 @@ class UIMapper @Inject constructor(
                         dataDate.firstUSDays,
                     )  ?: "+42"
                 else "",
-                secondUS = dataDate.secondFUG ?: "",
+                secondUS = dataDate.secondFUG,
                gestationalAgeBySecondUS =  if (dataDate.secondFUG != null &&
                     dataDate.secondUSWeeks != null &&
                     dataDate.secondUSDays != null
@@ -57,7 +58,7 @@ class UIMapper @Inject constructor(
                         dataDate.secondUSDays,
                     ) ?: "+42"
                 else "",
-                thirdUS = dataDate.secondFUG ?: "",
+                thirdUS = dataDate.secondFUG,
                 gestationalAgeByThirdUS = if (dataDate.thirdFUG != null &&
                     dataDate.thirdUSWeeks != null &&
                     dataDate.thirdUSDays != null
@@ -71,7 +72,7 @@ class UIMapper @Inject constructor(
                fpp =  calculateFPP(
                     dataDate.fUM,
                     USData(dataDate.firstFUG, dataDate.firstUSWeeks, dataDate.firstUSDays)
-                ),
+                ).toStandardDate(),
                 riskClassification =     pregnant.riskClassification,
                 listOfRiskFactors = if (pregnant.riskFactors != null)
                     getStringFromList(pregnant.riskFactors)

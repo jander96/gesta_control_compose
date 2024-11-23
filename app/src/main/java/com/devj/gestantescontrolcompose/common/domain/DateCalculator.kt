@@ -1,6 +1,8 @@
 package com.devj.gestantescontrolcompose.common.domain
 
+import java.time.ZonedDateTime
+
 interface DateCalculator {
-    fun getDaysDiff(dateInStringType: String): Int
-    fun addWeeksToADate(dateInStringType: String, weeks: Int): String
+    fun getDaysDiff(dateTime: ZonedDateTime): Int
+    fun addWeeksToADate(dateTime: ZonedDateTime, weeks: Int): ZonedDateTime
 }

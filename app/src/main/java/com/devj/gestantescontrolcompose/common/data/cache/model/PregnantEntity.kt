@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import com.devj.gestantescontrolcompose.common.domain.model.DataDate
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import com.devj.gestantescontrolcompose.common.domain.model.RiskFactor
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toIsoDate
 
 
 @Entity(tableName = "pregnant_table")
@@ -87,15 +88,15 @@ data class DataDateEmbedded(
     companion object {
         fun fromDomain(dataDate: DataDate): DataDateEmbedded {
             return DataDateEmbedded(
-                fUM = dataDate.fUM,
+                fUM = dataDate.fUM?.toIsoDate(),
                 isFUMReliable = dataDate.isFUMReliable,
-                firstFUG = dataDate.firstFUG,
+                firstFUG = dataDate.firstFUG?.toIsoDate(),
                 firstUSWeeks = dataDate.firstUSWeeks,
                 firstUSDays = dataDate.firstUSDays,
-                secondFUG = dataDate.secondFUG,
+                secondFUG = dataDate.secondFUG?.toIsoDate(),
                 secondUSWeeks = dataDate.secondUSWeeks,
                 secondUSDays = dataDate.secondUSDays,
-                thirdFUG = dataDate.thirdFUG,
+                thirdFUG = dataDate.thirdFUG?.toIsoDate(),
                 thirdUSWeeks = dataDate.thirdUSWeeks,
                 thirdUSDays = dataDate.thirdUSDays
             )

@@ -1,6 +1,5 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.viewmodel
 
-import android.os.PowerManager
 import com.devj.gestantescontrolcompose.common.basemvi.MviBaseViewModel
 import com.devj.gestantescontrolcompose.common.domain.usescases.GetAllPregnant
 import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
@@ -17,6 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalTime
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -94,10 +95,10 @@ class SchedulerViewModel @Inject constructor(
         }
     }
 
-    private fun changeDate(date: String): SchedulerEffect{
+    private fun changeDate(date: ZonedDateTime?): SchedulerEffect{
         return SchedulerEffect.UpdateField.Date(date)
     }
-    private fun changeTime(time: String): SchedulerEffect{
+    private fun changeTime(time: LocalTime?): SchedulerEffect{
         return SchedulerEffect.UpdateField.Time(time)
     }
     private fun changeText(text: String): SchedulerEffect{
@@ -107,9 +108,9 @@ class SchedulerViewModel @Inject constructor(
         return SchedulerEffect.UpdatedAddressed(addressee)
     }
     private fun validate(state: SchedulerViewState): Boolean{
-        return !state.date.isNullOrBlank() &&
-                !state.time.isNullOrBlank() &&
-                !state.text.isNullOrBlank() &&
+        return state.date != null &&
+                state.time != null &&
+                state.text.isNullOrBlank().not() &&
                 state.addressee.isNotEmpty()
     }
 
@@ -178,8 +179,8 @@ class SchedulerViewModel @Inject constructor(
             SchedulerEffect.Clean -> oldState.copy(
                 addressee = emptyList(),
                 text = "",
-                date = "",
-                time = "",
+                date = null,
+                time = null,
                 isValidMessage = false,
 
             )

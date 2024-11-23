@@ -4,6 +4,8 @@ package com.devj.gestantescontrolcompose.common.presenter.model
 import android.os.Parcelable
 import com.devj.gestantescontrolcompose.common.domain.model.RiskClassification
 import kotlinx.parcelize.Parcelize
+import java.time.ZonedDateTime
+
 @Parcelize
 data class PregnantUI(
     val id: Int,
@@ -15,13 +17,13 @@ data class PregnantUI(
     val weight: String,
     val iMC: String,
     val isFUMReliable: Boolean,
-    val fum : String,
+    val fum : ZonedDateTime?,
     val gestationalAgeByFUM: String,
-    val firstUS : String,
+    val firstUS : ZonedDateTime?,
     val gestationalAgeByFirstUS: String,
-    val secondUS : String,
+    val secondUS : ZonedDateTime?,
     val gestationalAgeBySecondUS: String,
-    val thirdUS : String,
+    val thirdUS : ZonedDateTime?,
     val gestationalAgeByThirdUS: String,
     val fpp : String,
     val riskClassification: RiskClassification,

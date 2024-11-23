@@ -41,6 +41,7 @@ import com.devj.gestantescontrolcompose.common.extensions.Spacer16
 import com.devj.gestantescontrolcompose.common.extensions.Spacer4
 import com.devj.gestantescontrolcompose.common.presenter.composables.CalendarPicker
 import com.devj.gestantescontrolcompose.common.presenter.composables.CircularIndicator
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
 import com.devj.gestantescontrolcompose.features.quick_calculator.domain.CalculatorIntent
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.enterFromEnd
 import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.enterFromStart
@@ -49,6 +50,7 @@ import com.devj.gestantescontrolcompose.features.quick_calculator.extensions.exi
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.composables.CustomSwitcher
 import com.devj.gestantescontrolcompose.features.quick_calculator.view.viewmodel.CalculatorViewModel
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
 import java.util.Locale
 
 @Composable
@@ -200,11 +202,11 @@ fun CalculatorSwitcher(
 fun CalculatorCard(
     modifier: Modifier = Modifier,
     isByUs: Boolean,
-    fumDate: String,
+    fumDate: ZonedDateTime?,
     onCalculateFumClick: () -> Unit,
-    onFumDateSelected: (String) -> Unit,
-    usDate: String,
-    onUsDateSelected: (String) -> Unit,
+    onFumDateSelected: (ZonedDateTime?) -> Unit,
+    usDate: ZonedDateTime?,
+    onUsDateSelected: (ZonedDateTime?) -> Unit,
     onCalculateUsClick: () -> Unit,
     onWeekSelected: (String) -> Unit,
     onDaySelected: (String) -> Unit,
@@ -228,7 +230,7 @@ fun CalculatorCard(
             //calcular por Us
             FUM(
                 modifier = modifier,
-                date = fumDate,
+                date = fumDate?.toStandardDate() ?: "",
                 onFumDateSelected = { date -> onFumDateSelected(date) },
                 onCalculateClick = onCalculateFumClick,
                 fumButtonEnabled = fumButtonEnabled,
@@ -244,7 +246,7 @@ fun CalculatorCard(
         ) {
             USG(
                 modifier = modifier,
-                date = usDate,
+                date = usDate?.toStandardDate() ?: "",
                 onUsDateSelected = { date -> onUsDateSelected(date) },
                 onCalculateClick = onCalculateUsClick,
                 weeks = weeks,
@@ -263,7 +265,7 @@ fun FUM(
     modifier: Modifier = Modifier,
     date: String,
     onCalculateClick: () -> Unit,
-    onFumDateSelected: (String) -> Unit,
+    onFumDateSelected: (ZonedDateTime?) -> Unit,
     fumButtonEnabled: Boolean = false,
 ) {
     var isCalendarVisible by rememberSaveable {
@@ -330,7 +332,7 @@ fun FUM(
 fun USG(
     modifier: Modifier = Modifier,
     date: String,
-    onUsDateSelected: (String) -> Unit,
+    onUsDateSelected: (ZonedDateTime?) -> Unit,
     onCalculateClick: () -> Unit,
     onWeekSelected: (String) -> Unit,
     onDaySelected: (String) -> Unit,

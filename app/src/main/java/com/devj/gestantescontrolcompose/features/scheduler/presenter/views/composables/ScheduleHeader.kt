@@ -16,24 +16,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
 import com.devj.gestantescontrolcompose.common.extensions.Spacer16
-import com.devj.gestantescontrolcompose.common.extensions.Spacer8
 import com.devj.gestantescontrolcompose.common.extensions.toCurrency
-import com.devj.gestantescontrolcompose.common.presenter.composables.UriImage
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.textualDate
+import java.time.ZonedDateTime
 
 @Composable
 fun ScheduleHeader(
     modifier: Modifier = Modifier,
-    date: String,
+    date: ZonedDateTime?,
     messageQuantity: Int,
     username: String
 ) {
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-
-
-                Text(text = date ,
+                Text(text = date?.textualDate() ?: "",
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
-
 
         }
         Spacer16()

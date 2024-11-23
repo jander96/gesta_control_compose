@@ -3,6 +3,8 @@ package com.devj.gestantescontrolcompose.features.scheduler.domain
 import com.devj.gestantescontrolcompose.common.basemvi.MviResult
 import com.devj.gestantescontrolcompose.common.domain.model.Pregnant
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalTime
+import java.time.ZonedDateTime
 
 sealed class SchedulerEffect: MviResult{
 
@@ -25,8 +27,8 @@ sealed class SchedulerEffect: MviResult{
         data class Error(val error: Throwable): InitialLoad()
     }
     sealed class UpdateField: SchedulerEffect(){
-        data class Date(val date: String): UpdateField()
-        data class Time(val time: String): UpdateField()
+        data class Date(val date: ZonedDateTime?): UpdateField()
+        data class Time(val time: LocalTime?): UpdateField()
         data class Text(val text: String): UpdateField()
     }
     data class UpdatedAddressed(val addressee: List<String>): SchedulerEffect()

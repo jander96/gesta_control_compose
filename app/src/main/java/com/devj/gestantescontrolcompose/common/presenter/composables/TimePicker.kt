@@ -33,29 +33,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.devj.gestantescontrolcompose.R
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTimePicker(
     onCancel: () -> Unit,
-    onConfirm: (String) -> Unit,
+    onConfirm: (LocalTime) -> Unit,
 ) {
     val timeState = rememberTimePickerState()
     val configuration = LocalConfiguration.current
     val showingPicker = remember { mutableStateOf(true) }
-    val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
     TimePickerDialog(
         onCancel = onCancel,
         onConfirm = {
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.HOUR_OF_DAY, timeState.hour)
-            cal.set(Calendar.MINUTE, timeState.minute)
-            cal.isLenient = false
-            val time = formatter.format(cal.time)
-            onConfirm(time)
+            onConfirm(LocalTime.of(timeState.hour,timeState.minute))
         },
         toggle = {
             if (configuration.screenHeightDp > 400) {

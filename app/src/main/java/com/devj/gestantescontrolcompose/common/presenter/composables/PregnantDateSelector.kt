@@ -24,20 +24,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.devj.gestantescontrolcompose.R
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
+import java.time.ZonedDateTime
 
 @Composable
 fun PregnantDateSelector(
-    usDate: String,
+    usDate: ZonedDateTime?,
     weeks: String,
     days: String,
-    fumDate: String,
+    fumDate: ZonedDateTime?,
     modifier: Modifier = Modifier,
     onWeekChange: (String)->Unit,
     onDaysChange: (String)->Unit,
     weekErrorMessage: String?,
     daysErrorMessage: String?,
-    onFumDateSelected: (String)->Unit,
-    onUsDateSelected: (String)->Unit,
+    onFumDateSelected: (ZonedDateTime?)->Unit,
+    onUsDateSelected: (ZonedDateTime?)->Unit,
     fieldTextStyle : TextStyle = MaterialTheme.typography.labelMedium,
     isFumReliable: Boolean,
     onCheckboxChange: (Boolean)->Unit,
@@ -70,7 +72,7 @@ fun PregnantDateSelector(
                 OutlinedTextField(
                     textStyle = fieldTextStyle,
                     enabled = false,
-                    value = usDate,
+                    value = usDate?.toStandardDate() ?: "",
                     modifier = modifier
                         .padding(4.dp)
                         .clickable { showUsCalendar = true },
@@ -80,7 +82,7 @@ fun PregnantDateSelector(
                     },
                     )
 
-                AnimatedVisibility(usDate.isNotEmpty()) {
+                AnimatedVisibility(usDate != null) {
                     Row {
                         OutlinedTextField(
                             textStyle = fieldTextStyle,
@@ -139,16 +141,16 @@ fun PregnantDateSelector(
                 OutlinedTextField(
                     textStyle = fieldTextStyle,
                     enabled = false,
-                    value = fumDate,
+                    value = fumDate?.toStandardDate() ?: "",
                     modifier = modifier
                         .padding(4.dp)
                         .clickable { showFumCalendar = true },
-                    onValueChange = { onFumDateSelected(it) },
+                    onValueChange = { },
                     placeholder = {
                         Text("FUM",style = fieldTextStyle)
                     },
                 )
-                AnimatedVisibility(showFumQuestion || fumDate.isNotEmpty()) {
+                AnimatedVisibility(showFumQuestion || fumDate != null) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = isFumReliable,

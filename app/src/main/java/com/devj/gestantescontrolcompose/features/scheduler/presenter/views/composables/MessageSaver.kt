@@ -1,6 +1,8 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables
 import androidx.compose.runtime.saveable.mapSaver
+import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toIsoDate
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
+import java.time.ZonedDateTime
 
 val MessageSaver = run {
     val idKey = "id"
@@ -14,7 +16,7 @@ val MessageSaver = run {
             mapOf(
                 idKey to message?.id,
                 messageKey to message?.message,
-                dateTimeKey to message?.dateTime,
+                dateTimeKey to message?.dateTime?.toIsoDate(),
                 tagKey to message?.tag,
                 addresseesKey to message?.addressees?.joinToString(",")
             )
@@ -24,7 +26,7 @@ val MessageSaver = run {
             Message(
                 id = map[idKey] as String,
                 message = map[messageKey] as String,
-                dateTime = map[dateTimeKey] as String,
+                dateTime = map[dateTimeKey]?.let { ZonedDateTime.parse(it as String) },
                 tag = map[tagKey] as String,
                 addressees = (map[addresseesKey] as String?)?.split(",") ?: emptyList()
             )

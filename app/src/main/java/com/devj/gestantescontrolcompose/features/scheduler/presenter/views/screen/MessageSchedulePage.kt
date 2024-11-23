@@ -3,8 +3,6 @@
 package com.devj.gestantescontrolcompose.features.scheduler.presenter.views.screen
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -42,8 +40,6 @@ import com.devj.gestantescontrolcompose.common.presenter.composables.AppTimePick
 import com.devj.gestantescontrolcompose.common.presenter.composables.CalendarPicker
 import com.devj.gestantescontrolcompose.common.presenter.composables.InfiniteLottieAnimation
 import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper
-import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardDate
-import com.devj.gestantescontrolcompose.common.utils.DateTimeHelper.toStandardTime
 import com.devj.gestantescontrolcompose.features.home.ui.composables.DeleteDialog
 import com.devj.gestantescontrolcompose.features.scheduler.domain.Message
 import com.devj.gestantescontrolcompose.features.scheduler.domain.SchedulerIntent
@@ -54,8 +50,11 @@ import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.compo
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.composables.ScheduleHeader
 import com.devj.gestantescontrolcompose.features.scheduler.presenter.views.viewmodel.SchedulerViewModel
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDateTime
+import java.time.temporal.TemporalAmount
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -266,18 +265,12 @@ fun MessageSchedulePage(
                                 pageState.deleteDialogVisibility(true)
                             },
                             onClick = {},
-                            onEdit = {
-                                pageState.setMessageToEdit(message)
-                                val formatter = DateTimeHelper.fullDateTimeAmFormatter
-                                val dateTime = LocalDateTime.parse(
-                                    pageState.messageToEdit.value!!.dateTime,
-                                    formatter
-                                )
-
-                                viewModel.sendUiEvent(SchedulerIntent.OnTextChanged(pageState.messageToEdit.value!!.message))
-                                viewModel.sendUiEvent(SchedulerIntent.OnDateChanged(dateTime.toStandardDate()))
-                                viewModel.sendUiEvent(SchedulerIntent.OnTimeChanged(dateTime.toStandardTime()))
-                                viewModel.sendUiEvent(SchedulerIntent.OnAddresseePicked(pageState.messageToEdit.value!!.addressees))
+                            onEdit = { msg ->
+                                pageState.setMessageToEdit(msg)
+                                viewModel.sendUiEvent(SchedulerIntent.OnTextChanged(msg.message))
+                                viewModel.sendUiEvent(SchedulerIntent.OnDateChanged(msg.dateTime))
+                                viewModel.sendUiEvent(SchedulerIntent.OnTimeChanged(msg.dateTime?.toLocalTime()))
+                                viewModel.sendUiEvent(SchedulerIntent.OnAddresseePicked(msg.addressees))
                             },
 
                             )
@@ -307,12 +300,10 @@ fun MessageSchedulePage(
                 },
                 onSendClick = {
                     smsPermission.launch(Manifest.permission.SEND_SMS)
-
-                        val dateTime = "${viewState.date} ${viewState.time}"
                         val messageScheduled = Message(
-                            id = it.ifEmpty { "${UUID.randomUUID()}_$dateTime" },
+                            id = it.ifEmpty { "${UUID.randomUUID()}_${viewState.date}" },
                             message = viewState.text ?: "",
-                            dateTime = dateTime,
+                            dateTime = viewState.date?.plusSeconds(viewState.time?.toSecondOfDay()?.toLong() ?: 0),
                             tag = "${UUID.randomUUID()}",
                             addressees = viewState.addressee
                         )

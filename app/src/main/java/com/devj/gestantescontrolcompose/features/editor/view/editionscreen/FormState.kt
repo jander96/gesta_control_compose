@@ -18,6 +18,7 @@ import com.devj.gestantescontrolcompose.common.extensions.createInternalFileFrom
 import com.devj.gestantescontrolcompose.common.extensions.timeStamp
 import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 import java.io.File
+import java.time.ZonedDateTime
 import java.util.Calendar
 
 const val AUTHORITY = "com.devj.gestantescontrolcompose.fileprovider"
@@ -48,7 +49,7 @@ class FormState ( private val context: Context) {
     val phone get() = _phone
     var phoneErrorMessage  by  mutableStateOf<String?>(null)
 
-    private var _firstUS by  mutableStateOf("")
+    private var _firstUS by  mutableStateOf<ZonedDateTime?>(null)
     val firstUS get()= _firstUS
 
     private var _firstUsWeeks by  mutableStateOf("")
@@ -59,7 +60,7 @@ class FormState ( private val context: Context) {
     val firstUSDays get()= _firstUSDays
     var daysErrorMessage  by  mutableStateOf<String?>(null)
 
-    private var _fum by  mutableStateOf("")
+    private var _fum by  mutableStateOf<ZonedDateTime?>(null)
     val fum get()= _fum
 
     private var _photo by  mutableStateOf<String?>(null)
@@ -138,16 +139,16 @@ class FormState ( private val context: Context) {
             weight,
         )
         val hasDate = (
-                fum.isNotEmpty() || (
-                        firstUS.isNotEmpty() &&
+                fum != null || (
+                        (firstUS != null) &&
                                 firstUSDays.isNotBlank() &&
                                 firstUsWeeks.isNotBlank()
                         )
                 )
 
         val isInsecureCalculateGestationalAge =
-            (fum.isNotBlank() && !isFumReliable) &&
-                    (firstUS.isBlank() || firstUSDays.isBlank() || firstUsWeeks.isBlank())
+            (fum != null && !isFumReliable) &&
+                    (firstUS != null || firstUSDays.isBlank() || firstUsWeeks.isBlank())
 
         return errors.all { message -> message == null } &&
                 requiredFields.none { it.isBlank() } &&
@@ -161,7 +162,7 @@ class FormState ( private val context: Context) {
         validateSize(size)
         validateWeight(weight)
 
-        if(firstUS.isNotEmpty()){
+        if(firstUS != null){
             validateFirstUsDays(firstUSDays)
             validateFirstUsWeeks(firstUsWeeks)
         }
@@ -248,7 +249,7 @@ class FormState ( private val context: Context) {
         this._weight = weight
         this.weightErrorMessage = validateWeight(weight)
     }
-    fun changeUsDate(us : String){
+    fun changeUsDate(us : ZonedDateTime?){
         _firstUS = us
     }
     fun changeUsWeeks(weeks : String){
@@ -259,7 +260,7 @@ class FormState ( private val context: Context) {
         _firstUSDays = days
         daysErrorMessage = validateFirstUsDays(days)
     }
-    fun changeFumDate(fum : String){
+    fun changeFumDate(fum : ZonedDateTime?){
         this._fum = fum
     }
 

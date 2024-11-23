@@ -1,6 +1,7 @@
 package com.devj.gestantescontrolcompose.common.utils
 
-import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -32,19 +33,27 @@ object DateTimeHelper{
     }
 
 
-    fun LocalDateTime.toStandardDate(): String {
-        val formatter = yearMonthDayFormatter
-        return formatter.format(this)
-    }
 
-    fun LocalDateTime.toStandardTime(): String {
+
+    fun LocalTime.toStandardTime(): String {
         val formatter = hourMinutesAmFormatter
         return formatter.format(this)
     }
 
-    fun LocalDateTime.textualDate(): String {
+    fun ZonedDateTime.textualDate(): String {
         val formatter = dayOfWeekMonthFormatter
         return formatter.format(this, )
     }
 
+    fun ZonedDateTime.toStandardDate(): String {
+        val formatter = yearMonthDayFormatter
+        return formatter.format(this)
+    }
+
+    fun ZonedDateTime.toIsoDate(): String {
+        return DateTimeFormatter.ISO_DATE_TIME.format(this)
+    }
+
 }
+
+
