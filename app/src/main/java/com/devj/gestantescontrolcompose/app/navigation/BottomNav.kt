@@ -71,7 +71,7 @@ fun BottomNavigation(
                 var index by rememberSaveable { mutableIntStateOf(0) }
 
                 NavigationBarItem(
-                    selected = navState?.destination?.route?.lowercase() == Home.route,
+                    selected = index == 0,
                     onClick = {
                         index = 0
                         onDestinationClick(index)
@@ -87,7 +87,7 @@ fun BottomNavigation(
                 )
 
                 NavigationBarItem(
-                    selected = navState?.destination?.route?.lowercase() == Calculator.route,
+                    selected = index == 1,
                     onClick = {
                         index = 1
                         onDestinationClick(index)
@@ -103,7 +103,7 @@ fun BottomNavigation(
                 )
 
                 NavigationBarItem(
-                    selected = navState?.destination?.route?.lowercase() == Scheduler.route,
+                    selected = index == 2,
                     onClick = {
                         index = 2
                         onDestinationClick(index)
@@ -112,7 +112,7 @@ fun BottomNavigation(
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = Icons.AutoMirrored.Outlined.Message,
-                            contentDescription = "Favorite",
+                            contentDescription = "Message",
                         )
                     },
                     colors = colors

@@ -1,42 +1,33 @@
 package com.devj.gestantescontrolcompose.app.navigation
 
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-import com.devj.gestantescontrolcompose.common.presenter.model.PregnantUI
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.Serializable
 
-interface Destination {
-    val name: String
-    val route: String
-}
-
-object Home : Destination {
-    override val name: String = "Home"
-    override val route: String = "home"
-}
-
-object Edition: Destination {
-     object Arguments {
-
-        const val PREGNANT = "pregnant"
+@Serializable
+sealed interface Destination {
+    companion object {
+        val START_DESTINATION = Home
     }
-    override val name = "Edicion"
-    override val route = "edition"
-    const val ROUTE_WITH_PARAMS = "edition/?pregnant={${Arguments.PREGNANT}}"
-
-    val arguments = listOf(navArgument(Arguments.PREGNANT) {
-        type = NavType.IntType
-    },)
-
-    fun passParams(pregnant: PregnantUI?) = "edition/?pregnant=${pregnant?.id ?: 0}"
 }
 
-object Calculator: Destination {
-    override val name: String = "Calculator"
-    override val route: String ="calculator"
-}
+@Serializable
+data object Home : Destination
 
-object Scheduler: Destination {
-    override val name: String = "Programador"
-    override val route: String ="schedule"
+@Serializable
+data class Edition(val pregnantId: Int? = null): Destination
+@Serializable
+data object Calculator: Destination
+@Serializable
+data object Scheduler: Destination
+
+
+class AppNavigationState {
+    private val _destination: MutableStateFlow<Destination> = MutableStateFlow(Home)
+    val destination: MutableStateFlow<Destination> = _destination
+
+    fun navigate(destination: Destination) {
+        _destination.value = destination
+
+    }
 }

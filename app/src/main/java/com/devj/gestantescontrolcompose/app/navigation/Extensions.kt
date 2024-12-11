@@ -5,12 +5,13 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
-fun NavController.launchSingleTopTo(route: String) =
-    navigate(route = route) {
+fun NavController.launchSingleTopTo(destination: Destination) {
+    navigate(destination) {
         popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
         restoreState = true
     }
+}
 
 fun <T> NavBackStackEntry.getSafeParcelable(key: String, clazz: Class<T> ): T?{
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -1,12 +1,13 @@
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
-    id("kotlin-parcelize")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties()
@@ -57,11 +58,11 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true //Desugar
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -95,6 +96,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.moshi.kotlin)
     implementation(libs.arrow.core)
+    implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.room.compiler)
     ksp(libs.hilt.android.compiler)

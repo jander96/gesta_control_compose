@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -45,10 +47,13 @@ fun HomeHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()) {
-                TextField(
+
+                OutlinedTextField(
+
+                    placeholder = {
+                        Text(text = stringResource(R.string.buscar))
+                    },
+                    singleLine = true,
                     value = query,
                     trailingIcon = {
                         Icon(
@@ -58,8 +63,9 @@ fun HomeHeader(
                     },
                     modifier = modifier
                         .width((withScreen * 0.6).dp)
-                        .height(48.dp),
-                    shape = MaterialTheme.shapes.small.copy(CornerSize(50.dp)),
+                        .padding(0.dp)
+                        ,
+                    shape = MaterialTheme.shapes.small.copy(CornerSize(40.dp)),
                     onValueChange = {
                         query = it
                         onSearch(it)
@@ -69,7 +75,7 @@ fun HomeHeader(
                         unfocusedIndicatorColor = Color.Transparent,
                     )
                 )
-        }
+
 
 
         Text(

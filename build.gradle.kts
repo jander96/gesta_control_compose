@@ -8,17 +8,18 @@ buildscript {
     }
 
     dependencies {
-        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+        classpath (libs.kotlin.gradle.plugin)
     }
 
 }
 
 plugins {
-    id ("com.android.application") version ("8.6.0") apply false
-    id ("org.jetbrains.kotlin.android") version ("2.0.21") apply false
-    id ("com.android.library") version ("8.0.2") apply false
-    id ("org.jetbrains.kotlin.plugin.compose") version ("2.0.0") apply false
-    id ("com.google.devtools.ksp") version ("2.0.21-1.0.25") apply false
-    id("com.google.dagger.hilt.android") version ("2.51") apply false
+    alias (libs.plugins.android.application) apply false
+    alias (libs.plugins.kotlin) apply false
+    alias(libs.plugins.compose) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.dagger.hilt) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.kotlin.parcelize) apply false
 }
 
